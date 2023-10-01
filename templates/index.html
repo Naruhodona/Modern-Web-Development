@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>Hello</title>
+    </head>
+    <body>
+        <h1>This is a hello Page</h1>
+        <p>hello, {{name}} </p>
+
+        {% if gender == 'male' %}
+            Hello Mr : {{name}}
+        {% else %}
+            Hello Ms : {{name}}
+        {% endif %}
+        <ul>
+        {% for name in names %}
+        <li>{{name}}</li>
+        {% endfor %}
+        </ul>
+        
+    </body>
+</html>
