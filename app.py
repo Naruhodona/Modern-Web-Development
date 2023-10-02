@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, make_response, session
-
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = '[im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae]'
+app.secret_key = 'WebUTS'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/mwd_2023'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/week5'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
