@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = 'skip2'
+app.secret_key = 'skip'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/mwd_2023'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
