@@ -4,22 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = '[im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae] [im gae]'
-
+app.secret_key = 'skip'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/mwd_2023'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-_content = '''
-<html>
-    
-    <body>
-        <h1>Heading 1</h1>
-        <h3>Heading 3</h3>
-        <p>Hello everywa</p>
-    </body>
-</html>'''
 
 class Student(db.Model):
     
@@ -42,10 +32,17 @@ class Subject(db.Model):
         self.code = code
         self.name = name
 
-message= "help i putus why"
 @app.route('/')
 def index():
-    # return "<h1>Index Page<p>This is a paragraph</p>"
+    _content = '''
+    <html>
+        
+        <body>
+            <h1>Heading 1</h1>
+            <h3>Heading 3</h3>
+            <p>Hello everywa</p>
+        </body>
+    </html>'''
     return _content
 
 @app.route('/hello/<name>')
