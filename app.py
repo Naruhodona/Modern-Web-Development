@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = 'skip'
+app.secret_key = 'skip2'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/mwd_2023'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
@@ -59,9 +59,15 @@ def helloPage():
     names=['kenji', 'yascentius']
     return render_template('index.html', name=name, gender='male', names=names)
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
+# Route untuk log in
+@app.route('/log_in')
+def log_in():
+    return render_template('log_in.html')
+
+# Route untuk registration
+@app.route('/registration')
+def registration():
+    return render_template('registration.html')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -111,6 +117,8 @@ def addStudent():
     db.session.commit()
 
 
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 
