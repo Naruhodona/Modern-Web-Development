@@ -1,19 +1,44 @@
-body {
-    background-color: #f4f4f4;
-}
+/* body {
+    background-color: maroon;
+    border: 1px solid red;
+} */
 
 .container {
-    margin-top: 100px;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.card {
-    border: 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.card-body {
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    background-color: whitesmoke;
+    
 }
 
-.card-header {
-    background-color: #007BFF;
-    color: #fff;
+.login-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.login-form {
+    width: 100%;
+    margin-left: 30px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
 }
 
 .btn-primary {
@@ -23,8 +48,4 @@ body {
 
 .btn-primary:hover {
     background-color: #0056b3;
-}
-
-.form-group label {
-    font-weight: bold;
 }
