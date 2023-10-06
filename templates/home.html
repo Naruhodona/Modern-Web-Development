@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="static/styling/home.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Calvin Library</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/profile">Profile <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Container Search bar dan filter -->
+    <div class="container mt-4">
+        <h2>Search for Books</h2>
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for books...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="input-group">
+                    <select class="custom-select" id="categorySelect">
+                        <option value="all">All Categories</option>
+                        <option value="fiction">Fiction</option>
+                        <option value="non-fiction">Non-Fiction</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" id="filterButton">Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Container untuk display books (hardcoded) -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Book 1 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book1.jpg" class="card-img-top" alt="Book 1" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Advanced Accounting</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal1">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 2 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book2.jpg" class="card-img-top" alt="Book 2" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Educated</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal2">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 3 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book3.jpg" class="card-img-top" alt="Book 3" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Evidence That Demands A Verdict</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal3">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 4 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book4.jpg" class="card-img-top" alt="Book 4" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Pengantar Ekonomi Mikro</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal4">More Info</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Book 1 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book1.jpg" class="card-img-top" alt="Book 1" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Advanced Accounting</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal1">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 2 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book2.jpg" class="card-img-top" alt="Book 2" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Educated</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal2">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 3 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book3.jpg" class="card-img-top" alt="Book 3" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Evidence That Demands A Verdict</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal3">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 4 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book4.jpg" class="card-img-top" alt="Book 4" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Pengantar Ekonomi Mikro</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal4">More Info</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Book 1 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book1.jpg" class="card-img-top" alt="Book 1" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Advanced Accounting</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal1">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 2 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book2.jpg" class="card-img-top" alt="Book 2" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Educated</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal2">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 3 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book3.jpg" class="card-img-top" alt="Book 3" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Evidence That Demands A Verdict</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal3">More Info</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Book 4 -->
+            <div class="col-md-3">
+                <div class="card mb-4 custom-card">
+                    <img src="static\book4.jpg" class="card-img-top" alt="Book 4" style="max-width: 200px; max-height: 200px;">
+                    <div class="card-body">
+                        <h6 class="card-title text-center">Pengantar Ekonomi Mikro</h6>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal4">More Info</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deskripsi lanjut untuk buku 1 -->
+    <div class="modal fade" id="bookInfoModal1" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookInfoModalLabel1">Book Title 1 Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Author: Author Name</p>
+                    <p>Category: Fiction</p>
+                    <p>Tersedia: Yes</p>
+                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deskripsi lanjut untuk buku 1 -->
+    <div class="modal fade" id="bookInfoModal2" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel2" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookInfoModalLabel2">Book Title 2 Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Author: Author Name</p>
+                    <p>Category: Non-Fiction</p>
+                    <p>Tersedia: No</p>
+                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

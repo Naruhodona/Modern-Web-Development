@@ -1,0 +1,55 @@
+.navbar {
+    background-color: #3498db;
+}
+
+.navbar-brand {
+    color: #fff;
+    font-weight: bold;
+}
+
+.navbar-brand:hover {
+    color: #fff;
+}
+
+.navbar-toggler-icon {
+    color: #fff;
+}
+
+.nav-link {
+    color: #333;
+}
+
+.nav-link:hover {
+    color: #3498db;
+}
+
+.card {
+    text-align: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1.2rem;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}

@@ -34,16 +34,7 @@ class Subject(db.Model):
 
 @app.route('/')
 def index():
-    _content = '''
-    <html>
-        
-        <body>
-            <h1>Heading 1</h1>
-            <h3>Heading 3</h3>
-            <p>Hello everywa</p>
-        </body>
-    </html>'''
-    return _content
+    return render_template('log_in.html')
 
 @app.route('/hello/<name>')
 def hello(name):
@@ -68,6 +59,14 @@ def log_in():
 @app.route('/registration')
 def registration():
     return render_template('registration.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
