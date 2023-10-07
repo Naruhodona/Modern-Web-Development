@@ -60,10 +60,12 @@ def log_in():
 def registration():
     return render_template('registration.html')
 
+# Route ke profile page
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
 
+# Route ke home
 @app.route('/home')
 def home():
     return render_template('home.html')
