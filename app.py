@@ -44,11 +44,11 @@ def hello(name):
 def exams(name):
     return "Exams of "+name+ " :)"
 
-@app.route('/hello')
-def helloPage():
-    name='kenji'
-    names=['kenji', 'yascentius']
-    return render_template('index.html', name=name, gender='male', names=names)
+# @app.route('/hello')
+# def helloPage():
+#     name='kenji'
+#     names=['kenji', 'yascentius']
+#     return render_template('index.html', name=name, gender='male', names=names)
 
 # Route untuk log in
 @app.route('/log_in')
