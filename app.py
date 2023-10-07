@@ -21,28 +21,28 @@ class Student(db.Model):
     def __init__(self, name):
         self.name = name
 
-class Subject(db.Model):
-    id = db.Column('id', db.Integer, primary_key=True)
-    code = db.Column(db.String(50))
-    name = db.Column(db.String(100))
+# class Subject(db.Model):
+#     id = db.Column('id', db.Integer, primary_key=True)
+#     code = db.Column(db.String(50))
+#     name = db.Column(db.String(100))
 
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
+#     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
 
-    def __init__(self, code, name):
-        self.code = code
-        self.name = name
+#     def __init__(self, code, name):
+#         self.code = code
+#         self.name = name
 
 @app.route('/')
 def index():
     return render_template('log_in.html')
 
-@app.route('/hello/<name>')
-def hello(name):
-    return "hello "+name+ " :)"
+# @app.route('/hello/<name>')
+# def hello(name):
+#     return "hello "+name+ " :)"
 
-@app.route('/hello/<name>/exams')
-def exams(name):
-    return "Exams of "+name+ " :)"
+# @app.route('/hello/<name>/exams')
+# def exams(name):
+#     return "Exams of "+name+ " :)"
 
 # @app.route('/hello')
 # def helloPage():
@@ -50,10 +50,10 @@ def exams(name):
 #     names=['kenji', 'yascentius']
 #     return render_template('index.html', name=name, gender='male', names=names)
 
-# Route untuk log in
-@app.route('/log_in')
-def log_in():
-    return render_template('log_in.html')
+# # Route untuk log in
+# @app.route('/log_in')
+# def log_in():
+#     return render_template('log_in.html')
 
 # Route untuk registration
 @app.route('/registration')
@@ -70,287 +70,70 @@ def profile():
 def home():
     return render_template('home.html')
 
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    resp = make_response(render_template('about.html'))
-    # resp.set_cookie('userName', 'Kenji')
-    session['userName'] = 'Kenji'
-    return resp
-    if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        # Business Logic
-        full_name = first_name + ' ' + last_name
-        # presentation layer
-        return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
-    elif request.method == 'GET':
-        # first_name = request.args.get('first_name')
-        # last_name = request.args.get('last_name')
+# Route ke staff home page
+@app.route('/staff_home')
+def staff_home():
+    return render_template('staff_home.html')
 
-        # # Business Logic
-        # full_name = first_name + ' ' + last_name
-        # # presentation layer
-        # return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
-        return render_template('form.html')
-@app.route('/form')
-def form():
-    return render_template('form.html')
+# Route ke login staff
+@app.route('/staff_login')
+def staff_login():
+    return render_template('staff_login.html')
 
-@app.route('/form_get')
-def form_get():
-    return render_template('form_get.html')
+@app.route('/peminjaman')
+def peminjaman():
+    return render_template('peminjaman.html')
 
-@app.route('/sayhello')
-def sayhello():
-    username = session['userName']
-    # username = request.cookies.get('userName')
-    if username == 'Kenji':
-        return render_template('form.html')
-    else:
-        return render_template('index.html')
+@app.route('/pengembalian')
+def pengembalian():
+    return render_template('pengembalian.html')
+# @app.route('/register', methods=['POST', 'GET'])
+# def register():
+#     resp = make_response(render_template('about.html'))
+#     # resp.set_cookie('userName', 'Kenji')
+#     session['userName'] = 'Kenji'
+#     return resp
+#     if request.method == 'POST':
+#         first_name = request.form.get('first_name')
+#         last_name = request.form.get('last_name')
+#         # Business Logic
+#         full_name = first_name + ' ' + last_name
+#         # presentation layer
+#         return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
+#     elif request.method == 'GET':
+#         # first_name = request.args.get('first_name')
+#         # last_name = request.args.get('last_name')
 
-@app.route('/addStudent')
-def addStudent():
-    std1 = Student('Stefanus')
-    std2 = Student('Fredrik')
-    db.session.add(std1)
-    db.session.add(std2)
-    db.session.commit()
+#         # # Business Logic
+#         # full_name = first_name + ' ' + last_name
+#         # # presentation layer
+#         # return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
+#         return render_template('form.html')
+# @app.route('/form')
+# def form():
+#     return render_template('form.html')
+
+# @app.route('/form_get')
+# def form_get():
+#     return render_template('form_get.html')
+
+# @app.route('/sayhello')
+# def sayhello():
+#     username = session['userName']
+#     # username = request.cookies.get('userName')
+#     if username == 'Kenji':
+#         return render_template('form.html')
+#     else:
+#         return render_template('index.html')
+
+# @app.route('/addStudent')
+# def addStudent():
+#     std1 = Student('Stefanus')
+#     std2 = Student('Fredrik')
+#     db.session.add(std1)
+#     db.session.add(std2)
+#     db.session.commit()
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Secret_message = "SEPTIO IS GAE FROM BASED FREDRIK"

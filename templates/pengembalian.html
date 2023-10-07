@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Staf Perpustakaan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/staff_home">Calvin Library</a>
+        <div class="navbar-nav ml-auto">
+            <div class="nav-item">
+                <a class="nav-link" href="/peminjaman">Peminjaman</a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="/pengembalian">Pengembalian</a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="/registration">Registrasi Member</a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" href="/staff_login">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2>Data buku yang sedang dipinjam</h2>
+        <hr>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">NIM</th>
+                    <th scope="col">Book ID</th>
+                    <th scope="col">Book Name</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal1">M01</button></th>
+                    <td>123</td>
+                    <td>Book Title 1</td>
+                    <td>2023-02-15</td>
+                    <td><button class="btn btn-primary">Buku kembali</button></td>
+                </tr>
+                <tr>
+                    <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal2">M02</button></th>
+                    <td>456</td>
+                    <td>Book Title 2</td>
+                    <td>2023-03-20</td>
+                    <td><button class="btn btn-primary" disabled>Buku kembali</button></td>
+                </tr>   
+            </tbody>
+        </table>
+    </div>
