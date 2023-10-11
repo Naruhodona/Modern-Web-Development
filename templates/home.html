@@ -59,75 +59,40 @@
     </div>
     
 
-    <!-- Container untuk display books (hardcoded) -->
     <div class="container mt-4">
         <div class="row">
-            <!-- Book 1 -->
+            {% for book in books %}
             <div class="col-md-3">
                 <div class="card mb-4 custom-card">
-                    <img src="static\book1.jpg" class="card-img-top" alt="Book 1" style="max-width: 200px; max-height: 200px;">
+                    <img src="{{book.image}}" class="card-img-top" alt="{{ book.nama_buku }}" style="max-width: 200px; max-height: 200px;">
                     <div class="card-body">
-                        <h6 class="card-title text-center">Advanced Accounting</h6>
+                        <h6 class="card-title text-center">{{ book.nama_buku }}</h6>
                     </div>
                     <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal1">More Info</a>
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal{{ book.id_buku }}">More Info</a>
                     </div>
                 </div>
             </div>
-            <!-- Book 2 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book2.jpg" class="card-img-top" alt="Book 2" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Educated</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal2">More Info</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Book 3 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book3.jpg" class="card-img-top" alt="Book 3" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Evidence That Demands A Verdict</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal3">More Info</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Book 4 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book4.jpg" class="card-img-top" alt="Book 4" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Pengantar Ekonomi Mikro</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal4">More Info</a>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
-
-    <!-- Deskripsi lanjut untuk buku 1 -->
-    <div class="modal fade" id="bookInfoModal1" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel1" aria-hidden="true">
+    
+    {% for book in books %}
+    <div class="modal fade" id="bookInfoModal{{ book.id_buku }}" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="bookInfoModalLabel1">Book Title 1 Details</h5>
+                    <h5 class="modal-title" id="bookInfoModalLabel">Book Information</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Author: Author Name</p>
-                    <p>Category: Fiction</p>
-                    <p>Tersedia: Yes</p>
-                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
+                    <h6>Title: {{ book.nama_buku }}</h6>
+                    <p>Author: {{ book.author }}</p>
+                    <p>Genre: {{ book.genre }}</p>
+                    <p>Stock: {% if book.stock > 0 %} Yes {% else %} No {% endif %}</p>
+                    <p>Description: {{ book.description }}</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -135,29 +100,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Deskripsi lanjut untuk buku 1 -->
-    <div class="modal fade" id="bookInfoModal2" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel2" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookInfoModalLabel2">Book Title 2 Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Author: Author Name</p>
-                    <p>Category: Non-Fiction</p>
-                    <p>Tersedia: No</p>
-                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>

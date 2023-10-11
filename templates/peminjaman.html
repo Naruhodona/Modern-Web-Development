@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halaman Staf Perpustakaan</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static\styling\peminjaman.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -53,107 +54,49 @@
     </div>
     
 
-    <!-- Container untuk display books (hardcoded) -->
     <div class="container mt-4">
         <div class="row">
-            <!-- Book 1 -->
+            {% for book in books %}
             <div class="col-md-3">
                 <div class="card mb-4 custom-card">
-                    <img src="static\book1.jpg" class="card-img-top" alt="Book 1" style="max-width: 200px; max-height: 200px;">
+                    <img src="{{book.image}}" class="card-img-top" alt="{{ book.nama_buku }}" style="max-width: 200px; max-height: 200px;">
                     <div class="card-body">
-                        <h6 class="card-title text-center">Advanced Accounting</h6>
+                        <h6 class="card-title text-center">{{ book.nama_buku }}</h6>
                     </div>
                     <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal1">More Info</a>
+                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal{{ book.id_buku }}">More Info</a>
                     </div>
                 </div>
             </div>
-            <!-- Book 2 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book2.jpg" class="card-img-top" alt="Book 2" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Educated</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal2">More Info</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Book 3 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book3.jpg" class="card-img-top" alt="Book 3" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Evidence That Demands A Verdict</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal3">More Info</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Book 4 -->
-            <div class="col-md-3">
-                <div class="card mb-4 custom-card">
-                    <img src="static\book4.jpg" class="card-img-top" alt="Book 4" style="max-width: 200px; max-height: 200px;">
-                    <div class="card-body">
-                        <h6 class="card-title text-center">Pengantar Ekonomi Mikro</h6>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal4">More Info</a>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
-    <!-- Deskripsi lanjut untuk buku 1 -->
-    <div class="modal fade" id="bookInfoModal1" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel1" aria-hidden="true">
+    {% for book in books %}
+    <div class="modal fade" id="bookInfoModal{{ book.id_buku }}" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="bookInfoModalLabel1">Book Title 1 Details</h5>
+                    <h5 class="modal-title" id="bookInfoModalLabel">Book Information</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Author: Author Name</p>
-                    <p>Category: Fiction</p>
-                    <p>Tersedia: Yes</p>
-                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
+                    <h6>Title: {{ book.nama_buku }}</h6>
+                    <p>Author: {{ book.author }}</p>
+                    <p>Genre: {{ book.genre }}</p>
+                    <p>Stock: {% if book.stock > 0 %} Yes {% else %} No {% endif %}</p>
+                    <p>Description: {{ book.description }}</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pinjamModal">Pinjam</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pinjamModal" data-bookid="{{ book.id_buku }}" data-booktitle="{{ book.nama_buku }}">Pinjam</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Deskripsi lanjut untuk buku 1 -->
-    <div class="modal fade" id="bookInfoModal2" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel2" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookInfoModalLabel2">Book Title 2 Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Author: Author Name</p>
-                    <p>Category: Non-Fiction</p>
-                    <p>Tersedia: No</p>
-                    <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla convallis libero a porttitor. Fusce auctor, massa in ultrices tincidunt.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pinjamModal">Pinjam</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 
     <!-- Modal untuk Pinjam buku -->
     <div class="modal fade" id="pinjamModal" tabindex="-1" role="dialog" aria-labelledby="pinjamModalLabel1" aria-hidden="true">
@@ -166,29 +109,64 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form action="/insert_peminjaman" method="POST">
                         <div class="form-group">
                             <label for="nim">NIM</label>
-                            <input type="text" class="form-control" id="nim" placeholder="Masukkan NIM">
+                            <input type="text" class="form-control" name="nim" id="nim" placeholder="Masukkan NIM">
+                        </div>
+                        <div class="form-group">
+                            <label for="idBuku">ID Buku</label>
+                            <input type="text" class="form-control" name="id_buku" id="id_buku" disabled>
+                            <!-- Hidden input to store the book's ID -->
+                            <input type="hidden" name="book_id" id="book_id">
                         </div>
                         <div class="form-group">
                             <label for="tglPeminjaman">Tanggal Peminjaman</label>
-                            <input type="date" class="form-control" id="tglPeminjaman">
+                            <input type="date" class="form-control" name="tglPeminjaman" id="tglPeminjaman">
                         </div>
                         <div class="form-group">
                             <label for="tglPengembalian">Tanggal Pengembalian</label>
-                            <input type="date" class="form-control" id="tglPengembalian">
+                            <input type="date" class="form-control" name="tglPengembalian" id="tglPengembalian">
+                        </div>
+                        <div class="form-group">
+                            <label for="keterangan">Keterangan</label>
+                            <input type="text" class="form-control" name="keterangan" id="keterangan" placeholder="Masukkan keterangan">
+                        </div>
+                        <input type="hidden" name="id_peminjaman" id="id_peminjaman">
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" id="submit-button">OK</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">OK</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
+                
             </div>
         </div>
     </div>
 
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var pinjamButtons = document.querySelectorAll('[data-target="#pinjamModal"]');
+            pinjamButtons.forEach(function(button) {
+                button.addEventListener("click", function() {
+                    var bookId = button.getAttribute("data-bookid");
+                    var bookTitle = button.getAttribute("data-booktitle");
+                    document.getElementById("id_buku").value = bookId;
+                    // Tambahkan baris ini untuk menghasilkan ID unik
+                    var uniquePeminjamanID = generateUniqueID();
+                    document.getElementById("id_peminjaman").value = uniquePeminjamanID;
+                    // document.getElementById("idBukuLabel").textContent = "ID Buku - " + bookTitle;
+                });
+            });
+    
+            // Fungsi untuk membuat ID peminjaman unik (misalnya, timestamp)
+            function generateUniqueID() {
+                var timestamp = new Date().getTime();
+                return timestamp;
+            }
+        });
+    </script>    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

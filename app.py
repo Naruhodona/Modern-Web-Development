@@ -1,59 +1,98 @@
-from flask import Flask, render_template, request, make_response, session
-
+from flask import Flask, render_template, request, make_response, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = 'skip2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/mwd_2023'
+app.secret_key = 'UTSWeb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/uts_pwm'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
 
 class Student(db.Model):
+    __tablename__ = 'student'
+    nim = db.Column(db.String(9), primary_key = True)
+    nama = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    prodi = db.Column(db.String(100))
+    password = db.Column(db.String(20))
+
+    denda = db.relationship('Denda', backref='denda')
+    peminjaman = db.relationship("Peminjaman", backref='peminjaman')
+
+    def __init__(self, nim, nama, email, prodi, password):
+        self.nim = nim
+        self.nama = nama
+        self.email = email
+        self.prodi = prodi
+        self.password = password
+
+class Buku(db.Model):
+    __tablename__ = 'buku'
+    id_buku = db.Column(db.String(100), primary_key=True)
+    nama_buku = db.Column(db.Text)
+    author = db.Column(db.Text)
+    genre = db.Column(db.Text)
+    stock = db.Column(db.Integer)
+    description = db.Column(db.Text)
+    image = db.Column(db.Text)
+    # denda = db.relationship('Denda', backref='denda')
+    # peminjaman = db.relationship("Peminjaman", backref='peminjaman')
+
+    def __init__(self, id_buku, nama_buku, author, genre, stock, description, image):
+        self.id_buku = id_buku
+        self.nama_buku = nama_buku
+        self.author = author
+        self.genre = genre
+        self.stock = stock
+        self.description = description
+        self.image = image
+
+class Staff(db.Model):
+    __tablename__ = 'staff'
+    username = db.Column(db.String(255), primary_key=True)
+    password = db.Column(db.String(20))
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+class Peminjaman(db.Model):
+    __tablename__ = 'peminjaman'
+    id_pinjam = db.Column(db.String(100), primary_key=True)
+    nim = db.Column(db.String(9), db.ForeignKey('student.nim'))
+    id_buku = db.Column(db.String(9), db.ForeignKey('buku.id_buku'))
+    keterangan = db.Column(db.Text)
+    batas_pengembalian = db.Column(db.Date)
+    tangal_peminjaman = db.Column(db.Date)
     
-    id = db.Column('id', db.Integer, primary_key = True)
-    name = db.Column(db.String(200))
+    def __init__(self, id_pinjam, nim, id_buku, keterangan, batas_pengembalian, tangal_peminjaman):
+        self.id_pinjam = id_pinjam
+        self.nim = nim
+        self.id_buku = id_buku
+        self.keterangan = keterangan
+        self.batas_pengembalian = batas_pengembalian
+        self.tangal_peminjaman = tangal_peminjaman
 
-    subjects = db.relationship('Subject', backref='subject')
+class Denda(db.Model):
+    __tablename__ = 'denda'
+    id_denda = db.Column(db.String(100), primary_key=True)
+    nim = db.Column(db.String(9), db.ForeignKey('student.nim'))
+    id_buku = db.Column(db.String(9), db.ForeignKey('buku.id_buku'))
+    batas_pengembalian = db.Column(db.Date)
+    nominal_denda = db.Column(db.Integer)
 
-    def __init__(self, name):
-        self.name = name
-
-# class Subject(db.Model):
-#     id = db.Column('id', db.Integer, primary_key=True)
-#     code = db.Column(db.String(50))
-#     name = db.Column(db.String(100))
-
-#     student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-
-#     def __init__(self, code, name):
-#         self.code = code
-#         self.name = name
+    def __init__(self, id_denda, nim, id_buku, batas_pengembalian, nominal_denda):
+        self.id_denda = id_denda
+        self.nim = nim
+        self.id_buku = id_buku
+        self.batas_pengembalian = batas_pengembalian
+        self.nominal_denda = nominal_denda
 
 @app.route('/')
 def index():
-    return render_template('log_in.html')
-
-# @app.route('/hello/<name>')
-# def hello(name):
-#     return "hello "+name+ " :)"
-
-# @app.route('/hello/<name>/exams')
-# def exams(name):
-#     return "Exams of "+name+ " :)"
-
-# @app.route('/hello')
-# def helloPage():
-#     name='kenji'
-#     names=['kenji', 'yascentius']
-#     return render_template('index.html', name=name, gender='male', names=names)
-
-# # Route untuk log in
-# @app.route('/log_in')
-# def log_in():
-#     return render_template('log_in.html')
+    return render_template("log_in.html", log_in = "true")
 
 # Route untuk registration
 @app.route('/registration')
@@ -65,10 +104,62 @@ def registration():
 def profile():
     return render_template('profile.html')
 
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == "POST":
+        nim = request.form.get('NIM')
+        password = request.form.get('password')
+        
+        students = Student.query.all()
+        
+        for student in students:
+            if student.nim == nim and student.password == password:
+                return redirect('/home')
+        return render_template("log_in.html", log_in = "false")
+    
+@app.route('/staff-login', methods=['POST'])
+def login_staff():
+    if request.method == "POST":
+        username = request.form.get('Username')
+        password = request.form.get('password')
+        
+        staffs = Staff.query.all()
+        
+        for staff in staffs:
+            if staff.username == username and staff.password == password:
+                return render_template('staff_home.html')
+        return render_template("staff_login.html", staff_log_in = "false")
+    
+@app.route('/insert_peminjaman', methods=['POST'])
+def insert_pinjaman():
+    if request.method == "POST":
+        id_pinjam = request.form.get('id_peminjaman')
+        nim = request.form.get('nim')
+        id_buku = request.form.get('id_buku')
+        keterangan = request.form.get('keterangan')
+        tangal_peminjaman = request.form.get('tglPeminjaman')
+        batas_pengembalian = request.form.get('tglPengembalian')
+        print(id_buku)
+        peminjaman = Peminjaman(id_pinjam=id_pinjam, nim=nim, id_buku=id_buku ,keterangan=keterangan, tangal_peminjaman=tangal_peminjaman, batas_pengembalian=batas_pengembalian)
+        db.session.add(peminjaman)
+        db.session.commit()
+
+        return redirect('/staff_home')
+    else:
+        return "Invalid request."
+
 # Route ke home
 @app.route('/home')
-def home():
-    return render_template('home.html')
+def homepage():
+    books = Buku.query.all()
+    return render_template('home.html', books=books)
+
+@app.route('/peminjaman')
+def peminjaman():
+    books = Buku.query.all()
+    return render_template("peminjaman.html", books=books)
+
+
 
 # Route ke staff home page
 @app.route('/staff_home')
@@ -81,12 +172,14 @@ def staff_login():
     return render_template('staff_login.html')
 
 @app.route('/peminjaman')
-def peminjaman():
+def pinjam():
     return render_template('peminjaman.html')
 
 @app.route('/pengembalian')
 def pengembalian():
     return render_template('pengembalian.html')
+
+
 # @app.route('/register', methods=['POST', 'GET'])
 # def register():
 #     resp = make_response(render_template('about.html'))
