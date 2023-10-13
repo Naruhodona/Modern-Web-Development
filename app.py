@@ -102,21 +102,30 @@ def check_denda():
     for peminjaman, student in joined_data:
         due_date = datetime.strptime(str(peminjaman.batas_pengembalian), '%Y-%m-%d')
         if (today - due_date).days > 0:
-        
-            if (peminjaman.nim not in data_denda[1]) and (peminjaman.id_buku not in data_denda[2]):
-                
-                if dd.status == "LUNAS":
-                    status_list.append(True)
-                else:
-                    status_list.append(False)
-            else:
-                id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
-                if id_denda not in list_id_denda:
-                    denda = Denda(id_denda=id_denda, nim=peminjaman.nim, id_buku=peminjaman.id_buku ,status="BELUM LUNAS", batas_pengembalian=peminjaman.batas_pengembalian)
-                    db.session.add(denda)
-                    db.session.commit()
-
-            id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
+            try:
+                for dd in data_denda:
+                    if (peminjaman.nim == dd.nim) and (peminjaman.id_buku == dd.id_buku):
+                        if dd.status == "LUNAS":
+                            status_list.append(True)
+                        else:
+                            status_list.append(False)
+                    else:
+                        id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
+                        if id_denda not in list_id_denda:
+                            denda = Denda(id_denda=id_denda, nim=peminjaman.nim, id_buku=peminjaman.id_buku ,status="BELUM LUNAS", batas_pengembalian=peminjaman.batas_pengembalian)
+                            db.session.add(denda)
+                            db.session.commit()
+                            
+                if False not in status_list and status_list != []:
+                    id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
+                    if id_denda not in list_id_denda:
+                        denda = Denda(id_denda=id_denda, nim=peminjaman.nim, id_buku=peminjaman.id_buku ,status="BELUM LUNAS", batas_pengembalian=peminjaman.batas_pengembalian)
+                        db.session.add(denda)
+                        db.session.commit()
+                status_list = []
+            except Exception as e:
+                print("Kesalahan", str(e))
+                db.session.rollback()
 
 @app.route('/')
 def index():
@@ -199,8 +208,6 @@ def homepage():
 def peminjaman():
     books = Buku.query.all()
     return render_template("peminjaman.html", books=books)
-
-
 
 # Route ke staff home page
 @app.route('/staff_home')
