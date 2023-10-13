@@ -153,6 +153,7 @@
                     var bookId = button.getAttribute("data-bookid");
                     var bookTitle = button.getAttribute("data-booktitle");
                     document.getElementById("id_buku").value = bookId;
+                    document.getElementById("book_id").value = bookId;
                     // Tambahkan baris ini untuk menghasilkan ID unik
                     var uniquePeminjamanID = generateUniqueID();
                     document.getElementById("id_peminjaman").value = uniquePeminjamanID;

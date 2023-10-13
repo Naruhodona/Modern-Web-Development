@@ -12,22 +12,33 @@
     <div class="container">
         <div class="registration-form">
             <h2>Registration</h2>
-            <form>
+            <form action="/insert_registration" method="post">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
-                    <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+                    <input type="text" class="form-control" id="fullName" name="nama" placeholder="Enter your full name">
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">NIM</label>
-                    <input type="password" class="form-control" id="confirmPassword" placeholder="Enter your NIM">
+                    <label for="NIM">NIM</label>
+                    <input type="text" class="form-control" id="NIM" name="NIM" placeholder="Enter your NIM">
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
+                </div>
+                <div class="form-group">
+                    <label for="prodi">Prodi</label>
+                    <select class="form-control" id="prodi" name="prodi">
+                        <option value="IBDA">IBDA</option>
+                        <option value="IEE">IEE</option>
+                        <option value="CFP">CFP</option>
+                        <option value="BMS">BMS</option>
+                        <option value="SCCE">SCCE</option>
+                        <option value="ASD">ASD</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Register</button>
             </form>

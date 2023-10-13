@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, make_response, session, redirect
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -81,27 +82,57 @@ class Denda(db.Model):
     nim = db.Column(db.String(9), db.ForeignKey('student.nim'))
     id_buku = db.Column(db.String(9), db.ForeignKey('buku.id_buku'))
     batas_pengembalian = db.Column(db.Date)
-    nominal_denda = db.Column(db.Integer)
+    status = db.Column(db.Text)
 
-    def __init__(self, id_denda, nim, id_buku, batas_pengembalian, nominal_denda):
+    def __init__(self, id_denda, nim, id_buku, batas_pengembalian, status):
         self.id_denda = id_denda
         self.nim = nim
         self.id_buku = id_buku
         self.batas_pengembalian = batas_pengembalian
-        self.nominal_denda = nominal_denda
+        self.status = status
+
+def check_denda():
+    today = datetime.now()
+    data_denda = Denda.query.all()
+    list_id_denda = []
+    for dd in data_denda:
+        list_id_denda.append(dd.id_denda)
+    joined_data = db.session.query(Peminjaman, Student).join(Student, Peminjaman.nim == Student.nim).all()
+    status_list = []
+    for peminjaman, student in joined_data:
+        due_date = datetime.strptime(str(peminjaman.batas_pengembalian), '%Y-%m-%d')
+        if (today - due_date).days > 0:
+        
+            if (peminjaman.nim not in data_denda[1]) and (peminjaman.id_buku not in data_denda[2]):
+                
+                if dd.status == "LUNAS":
+                    status_list.append(True)
+                else:
+                    status_list.append(False)
+            else:
+                id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
+                if id_denda not in list_id_denda:
+                    denda = Denda(id_denda=id_denda, nim=peminjaman.nim, id_buku=peminjaman.id_buku ,status="BELUM LUNAS", batas_pengembalian=peminjaman.batas_pengembalian)
+                    db.session.add(denda)
+                    db.session.commit()
+
+            id_denda = "D" + str(due_date.year) + str(due_date.month) + str(due_date.day) + str(peminjaman.nim) + str(peminjaman.id_buku)
 
 @app.route('/')
 def index():
+    check_denda()
     return render_template("log_in.html", log_in = "true")
 
 # Route untuk registration
 @app.route('/registration')
 def registration():
+    check_denda()
     return render_template('registration.html')
 
 # Route ke profile page
 @app.route('/profile')
 def profile():
+    check_denda()
     return render_template('profile.html')
 
 @app.route('/login', methods=['POST'])
@@ -114,7 +145,9 @@ def login():
         
         for student in students:
             if student.nim == nim and student.password == password:
-                return redirect('/home')
+                response = make_response(redirect('/home'))
+                response.set_cookie('nim', student.nim)
+                return response
         return render_template("log_in.html", log_in = "false")
     
 @app.route('/staff-login', methods=['POST'])
@@ -135,7 +168,7 @@ def insert_pinjaman():
     if request.method == "POST":
         id_pinjam = request.form.get('id_peminjaman')
         nim = request.form.get('nim')
-        id_buku = request.form.get('id_buku')
+        id_buku = request.form.get('book_id')
         keterangan = request.form.get('keterangan')
         tangal_peminjaman = request.form.get('tglPeminjaman')
         batas_pengembalian = request.form.get('tglPengembalian')
@@ -151,8 +184,16 @@ def insert_pinjaman():
 # Route ke home
 @app.route('/home')
 def homepage():
-    books = Buku.query.all()
-    return render_template('home.html', books=books)
+    nim = request.cookies.get('nim')
+    if nim:
+        # Lakukan sesuatu dengan user_id, seperti mengambil data pengguna
+        user = Student.query.get(nim)
+        if user:
+            # Pengguna sudah login, tampilkan halaman /home
+            books = Buku.query.all()
+            return render_template('home.html', books=books, user=user)
+    # Pengguna belum login, mungkin Anda ingin mengarahkan mereka kembali ke halaman login
+    return redirect('/')
 
 @app.route('/peminjaman')
 def peminjaman():
@@ -164,7 +205,23 @@ def peminjaman():
 # Route ke staff home page
 @app.route('/staff_home')
 def staff_home():
-    return render_template('staff_home.html')
+    joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
+    data_denda = []
+    for denda, buku, student in joined_data:
+        today = datetime.now()
+        selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
+        if denda.status !=  "LUNAS":
+            data_denda.append({
+                'id_denda': denda.id_denda,
+                'nim': denda.nim,
+                'nama': student.nama,
+                'id_buku': denda.id_buku,
+                'batas_pengembalian': denda.batas_pengembalian,
+                'nominal_denda': selisih_hari*1000,
+                'nama_buku': buku.nama_buku,
+                'prodi': student.prodi
+            })
+    return render_template('staff_home.html', denda=data_denda)
 
 # Route ke login staff
 @app.route('/staff_login')
@@ -179,53 +236,20 @@ def pinjam():
 def pengembalian():
     return render_template('pengembalian.html')
 
+@app.route('/insert_registration', methods=["POST"])
+def insert_registration():
+    if request.method == "POST":
+        nim = request.form.get('NIM')
+        nama = request.form.get('nama')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        prodi = request.form.get('prodi')
+        student = Student(nim=nim, nama=nama ,email=email, password=password, prodi=prodi)
+        db.session.add(student)
+        db.session.commit()
 
-# @app.route('/register', methods=['POST', 'GET'])
-# def register():
-#     resp = make_response(render_template('about.html'))
-#     # resp.set_cookie('userName', 'Kenji')
-#     session['userName'] = 'Kenji'
-#     return resp
-#     if request.method == 'POST':
-#         first_name = request.form.get('first_name')
-#         last_name = request.form.get('last_name')
-#         # Business Logic
-#         full_name = first_name + ' ' + last_name
-#         # presentation layer
-#         return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
-#     elif request.method == 'GET':
-#         # first_name = request.args.get('first_name')
-#         # last_name = request.args.get('last_name')
-
-#         # # Business Logic
-#         # full_name = first_name + ' ' + last_name
-#         # # presentation layer
-#         # return render_template('welcome.html', full_name=full_name, first_name=first_name, last_name=last_name)
-#         return render_template('form.html')
-# @app.route('/form')
-# def form():
-#     return render_template('form.html')
-
-# @app.route('/form_get')
-# def form_get():
-#     return render_template('form_get.html')
-
-# @app.route('/sayhello')
-# def sayhello():
-#     username = session['userName']
-#     # username = request.cookies.get('userName')
-#     if username == 'Kenji':
-#         return render_template('form.html')
-#     else:
-#         return render_template('index.html')
-
-# @app.route('/addStudent')
-# def addStudent():
-#     std1 = Student('Stefanus')
-#     std2 = Student('Fredrik')
-#     db.session.add(std1)
-#     db.session.add(std2)
-#     db.session.commit()
+    return redirect('/staff_home')
+    
 
 
 if __name__ == '__main__':
