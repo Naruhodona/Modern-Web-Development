@@ -306,9 +306,11 @@ def insert_pinjaman():
         keterangan = request.form.get('keterangan')
         tangal_peminjaman = request.form.get('tglPeminjaman')
         batas_pengembalian = request.form.get('tglPengembalian')
-        print(id_buku)
+        
         peminjaman = Peminjaman(id_pinjam=id_pinjam, nim=nim, id_buku=id_buku ,keterangan=keterangan, tangal_peminjaman=tangal_peminjaman, batas_pengembalian=batas_pengembalian)
         db.session.add(peminjaman)
+        buku = Buku.query.filter_by(id_buku=id_buku).first()
+        buku.stock -= 1
         db.session.commit()
         return redirect('/staff_home')
     else:
@@ -360,6 +362,8 @@ def update_peminjaman():
    peminjaman_record = Peminjaman.query.filter_by(id_pinjam=id_pinjam).first()
    if peminjaman_record:
         peminjaman_record.keterangan = "KEMBALI"
+        buku = Buku.query.filter_by(id_buku=peminjaman_record.id_buku).first()
+        buku.stock += 1
         db.session.commit()
 
         return "Success"
