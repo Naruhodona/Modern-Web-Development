@@ -252,6 +252,7 @@ def staff_home():
                 'nim': denda.nim,
                 'nama': student.nama,
                 'id_buku': denda.id_buku,
+                'email' : student.email,
                 'batas_pengembalian': denda.batas_pengembalian,
                 'nominal_denda': selisih_hari*1000,
                 'nama_buku': buku.nama_buku,
