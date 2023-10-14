@@ -143,7 +143,29 @@ def registration():
 @app.route('/profile')
 def profile():
     check_denda()
-    return render_template('profile.html')
+    nim = request.cookies.get('nim')
+    if nim:
+        # Lakukan sesuatu dengan user_id, seperti mengambil data pengguna
+        user = Student.query.get(nim)
+        if user:
+            joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
+            data_user = Student.query.filter(Student.nim == nim)
+            data_denda = []
+            for denda, buku, student in joined_data:
+                today = datetime.now()
+                selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
+                if denda.status !=  "LUNAS" and denda.nim == nim:
+                    data_denda.append({
+                        'id_denda': denda.id_denda,
+                        'id_buku': denda.id_buku,
+                        'batas_pengembalian': denda.batas_pengembalian,
+                        'nominal_denda': "Rp. "+str(selisih_hari*1000),
+                        'nama_buku': buku.nama_buku
+                    })
+            return render_template('profile.html', data_user=data_user, data_denda=data_denda)
+    else:
+        return redirect('/')
+    
 
 @app.route('/login', methods=['POST'])
 def login():
