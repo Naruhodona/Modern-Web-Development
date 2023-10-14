@@ -10,7 +10,6 @@ app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-
 class Student(db.Model):
     __tablename__ = 'student'
     nim = db.Column(db.String(9), primary_key = True)
@@ -95,10 +94,12 @@ def check_denda():
     today = datetime.now()
     data_denda = Denda.query.all()
     list_id_denda = []
+
     for dd in data_denda:
         list_id_denda.append(dd.id_denda)
     joined_data = db.session.query(Peminjaman, Student).join(Student, Peminjaman.nim == Student.nim).all()
     status_list = []
+    
     for peminjaman, student in joined_data:
         due_date = datetime.strptime(str(peminjaman.batas_pengembalian), '%Y-%m-%d')
         if (today - due_date).days > 0:
@@ -149,7 +150,6 @@ def login():
     if request.method == "POST":
         nim = request.form.get('NIM')
         password = request.form.get('password')
-        
         students = Student.query.all()
         
         for student in students:
@@ -172,42 +172,49 @@ def login_staff():
                 return render_template('staff_home.html')
         return render_template("staff_login.html", staff_log_in = "false")
     
-@app.route('/insert_peminjaman', methods=['POST'])
-def insert_pinjaman():
-    if request.method == "POST":
-        id_pinjam = request.form.get('id_peminjaman')
-        nim = request.form.get('nim')
-        id_buku = request.form.get('book_id')
-        keterangan = request.form.get('keterangan')
-        tangal_peminjaman = request.form.get('tglPeminjaman')
-        batas_pengembalian = request.form.get('tglPengembalian')
-        print(id_buku)
-        peminjaman = Peminjaman(id_pinjam=id_pinjam, nim=nim, id_buku=id_buku ,keterangan=keterangan, tangal_peminjaman=tangal_peminjaman, batas_pengembalian=batas_pengembalian)
-        db.session.add(peminjaman)
-        db.session.commit()
-
-        return redirect('/staff_home')
-    else:
-        return "Invalid request."
-
-# Route ke home
 @app.route('/home')
 def homepage():
     nim = request.cookies.get('nim')
     if nim:
-        # Lakukan sesuatu dengan user_id, seperti mengambil data pengguna
         user = Student.query.get(nim)
         if user:
-            # Pengguna sudah login, tampilkan halaman /home
-            books = Buku.query.all()
-            return render_template('home.html', books=books, user=user)
-    # Pengguna belum login, mungkin Anda ingin mengarahkan mereka kembali ke halaman login
-    return redirect('/')
+            page = int(request.args.get('page', 1))
+            books_per_page = 12
 
-@app.route('/peminjaman')
-def peminjaman():
-    books = Buku.query.all()
-    return render_template("peminjaman.html", books=books)
+            filter_text = request.args.get('filter')
+            category = request.args.get('category')
+
+            books = Buku.query
+
+            if category == 'writer':
+                books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
+            elif category == 'title':
+                books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
+            elif category == 'genre':
+                books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
+
+            books = books.all()
+
+            total_pages = (len(books) + books_per_page - 1) // books_per_page
+            start_index = (page - 1) * books_per_page
+            end_index = start_index + books_per_page
+
+            books_to_display = books[start_index:end_index]
+
+            if total_pages == 0:
+                return render_template('home.html', books=books_to_display, user=user, total_buku=len(books), halaman=page, total_pages=total_pages)
+
+            return render_template(
+                'home.html',
+                books=books_to_display,
+                user=user,
+                total_buku=len(books),
+                halaman=page,
+                total_pages=total_pages,
+                filter=filter_text,
+                category=category,
+            )
+    return redirect('/')
 
 # Route ke staff home page
 @app.route('/staff_home')
@@ -230,6 +237,61 @@ def staff_home():
             })
     return render_template('staff_home.html', denda=data_denda)
 
+@app.route('/peminjaman')
+def peminjaman():
+    page = int(request.args.get('page', 1))
+    books_per_page = 12
+
+    filter_text = request.args.get('filter')
+    category = request.args.get('category')
+
+    books = Buku.query
+
+    if category == 'writer':
+        books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
+    elif category == 'title':
+        books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
+    elif category == 'genre':
+        books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
+
+    books = books.all()
+
+    total_pages = (len(books) + books_per_page - 1) // books_per_page
+    start_index = (page - 1) * books_per_page
+    end_index = start_index + books_per_page
+
+    books_to_display = books[start_index:end_index]
+
+    if total_pages == 0:
+        return render_template('peminjaman.html', books=books_to_display, total_buku=len(books), halaman=page, total_pages=total_pages)
+
+    return render_template(
+        'peminjaman.html',
+        books=books_to_display,
+        total_buku=len(books),
+        halaman=page,
+        total_pages=total_pages,
+        filter=filter_text,
+        category=category,
+    )
+
+@app.route('/insert_peminjaman', methods=['POST'])
+def insert_pinjaman():
+    if request.method == "POST":
+        id_pinjam = request.form.get('id_peminjaman')
+        nim = request.form.get('nim')
+        id_buku = request.form.get('book_id')
+        keterangan = request.form.get('keterangan')
+        tangal_peminjaman = request.form.get('tglPeminjaman')
+        batas_pengembalian = request.form.get('tglPengembalian')
+        print(id_buku)
+        peminjaman = Peminjaman(id_pinjam=id_pinjam, nim=nim, id_buku=id_buku ,keterangan=keterangan, tangal_peminjaman=tangal_peminjaman, batas_pengembalian=batas_pengembalian)
+        db.session.add(peminjaman)
+        db.session.commit()
+        return redirect('/staff_home')
+    else:
+        return "Invalid request."
+
 # Route ke login staff
 @app.route('/staff_login')
 def staff_login():
@@ -241,7 +303,20 @@ def pinjam():
 
 @app.route('/pengembalian')
 def pengembalian():
-    return render_template('pengembalian.html')
+    data_pengembalian = db.session.query(
+        Peminjaman.id_pinjam,
+        Peminjaman.nim,
+        Peminjaman.id_buku,
+        Peminjaman.keterangan,
+        Peminjaman.batas_pengembalian,
+        Peminjaman.keterangan,
+        Buku.nama_buku
+    ).join(
+        Buku, Peminjaman.id_buku == Buku.id_buku
+    ).all()
+    
+    return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
+
 
 @app.route('/insert_registration', methods=["POST"])
 def insert_registration():
@@ -257,7 +332,16 @@ def insert_registration():
 
     return redirect('/staff_home')
     
+@app.route('/update_peminjaman', methods=["POST"])
+def update_peminjaman():
+   id_pinjam = request.args.get('id_pinjam')
+   peminjaman_record = Peminjaman.query.filter_by(id_pinjam=id_pinjam).first()
+   if peminjaman_record:
+        peminjaman_record.keterangan = "KEMBALI"
+        db.session.commit()
 
+        return "Success"
+   return "Failed to update Peminjaman record."
 
 if __name__ == '__main__':
     app.run(debug=True)

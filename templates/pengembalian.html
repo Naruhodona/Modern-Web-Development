@@ -6,6 +6,7 @@
     <title>Halaman Staf Perpustakaan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -14,7 +15,7 @@
             <div class="nav-item">
                 <a class="nav-link" href="/peminjaman">Peminjaman</a>
             </div>
-            <div class="nav-item">
+            <div class="nav-item active">
                 <a class="nav-link" href="/pengembalian">Pengembalian</a>
             </div>
             <div class="nav-item">
@@ -39,20 +40,65 @@
                 </tr>
             </thead>
             <tbody>
+                {% for item in data_pengembalian %}
                 <tr>
-                    <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal1">M01</button></th>
-                    <td>123</td>
-                    <td>Book Title 1</td>
-                    <td>2023-02-15</td>
-                    <td><button class="btn btn-primary">Buku kembali</button></td>
+                    <th scope="row">{{ item.nim }}</button></th>
+                    <td>{{ item.id_buku }}</td>
+                    <td>{{ item.nama_buku }}</td>
+                    <td>{{ item.batas_pengembalian }}</td>
+                    <td>
+                        {% if item.keterangan == "BELUM KEMBALI" %}
+                            <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ item.nim }}">BELUM KEMBALI</button>
+
+                            <div class="modal fade" id="confirmModal-{{ item.nim }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                            <button type="button" class="btn btn-danger" onclick="executeFunction('{{ item.id_pinjam}}')">Yes</button>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        {% elif item.keterangan == "KEMBALI" %}
+                            <button class="btn btn-success" disabled>KEMBALI</button>
+                        {% endif %}
+                    </td>
                 </tr>
-                <tr>
-                    <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal2">M02</button></th>
-                    <td>456</td>
-                    <td>Book Title 2</td>
-                    <td>2023-03-20</td>
-                    <td><button class="btn btn-primary" disabled>Buku kembali</button></td>
-                </tr>   
+                {% endfor %}
             </tbody>
         </table>
     </div>
+</body>
+<script>
+    function executeFunction(id_pinjam) {
+        fetch(`/update_peminjaman?id_pinjam=${id_pinjam}`, {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Request failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</html>
