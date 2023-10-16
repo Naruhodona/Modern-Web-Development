@@ -187,7 +187,7 @@ def login_staff():
             if staff.username == username and staff.password == password:
                 response = make_response(redirect('/staff_home'))
                 response.set_cookie('staff_username', staff.username)
-                return render_template('staff_home.html')
+                return response
         return render_template("staff_login.html", staff_log_in = "false")
     
 @app.route('/home')
@@ -354,18 +354,22 @@ def pengembalian():
     if username:
         user_staff = Staff.query.get(username)
         if user_staff:
-            data_pengembalian = db.session.query(
-                Peminjaman.id_pinjam,
-                Peminjaman.nim,
-                Peminjaman.id_buku,
-                Peminjaman.keterangan,
-                Peminjaman.batas_pengembalian,
-                Peminjaman.keterangan,
-                Buku.nama_buku
+            data_pengembalian = []
+            data_query = db.session.query(
+                Peminjaman, Buku
             ).join(
                 Buku, Peminjaman.id_buku == Buku.id_buku
-            ).filter(Peminjaman.keterangan == "KEMBALI")
-            
+            ).filter(Peminjaman.keterangan == "BELUM KEMBALI").all()
+            for peminjaman, buku in data_query:
+                data_pengembalian.append({
+                    'nim': peminjaman.nim,
+                    'id_buku': peminjaman.id_buku,
+                    'nama_buku': buku.nama_buku,
+                    'batas_pengembalian': peminjaman.batas_pengembalian,
+                    'id_pinjam': peminjaman.id_pinjam,
+
+                })
+            print(data_pengembalian)
             return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
     return redirect('/staff_login')
 

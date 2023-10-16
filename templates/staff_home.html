@@ -22,7 +22,7 @@
                 <a class="nav-link" href="/registration">Registrasi Member</a>
             </div>
             <div class="nav-item">
-                <a class="nav-link" href="/staff_login" onclick="document.cookie = 'username=;'">Logout</a>
+                <a class="nav-link" href="/staff_login" onclick="document.cookie = 'staff_username=;'">Logout</a>
             </div>
         </div>
     </nav>
@@ -52,7 +52,7 @@
                     <td>
                         <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ d.id_denda }}">PAID</button>
 
-                        <div class="modal fade" id="confirmModal-{{ item.nim }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                        <div class="modal fade" id="confirmModal-{{ d.id_denda }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">

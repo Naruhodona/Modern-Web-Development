@@ -22,7 +22,7 @@
                 <a class="nav-link" href="/registration">Registrasi Member</a>
             </div>
             <div class="nav-item">
-                <a class="nav-link" href="/staff_login" onclick="document.cookie = 'username=;'">Logout</a>
+                <a class="nav-link" href="/staff_login" onclick="document.cookie = 'staff_username=;'">Logout</a>
             </div>
         </div>
     </nav>
@@ -42,15 +42,14 @@
             <tbody>
                 {% for item in data_pengembalian %}
                 <tr>
-                    <th scope="row">{{ item.nim }}</button></th>
+                    <th scope="row">{{ item.nim}}</button></th>
                     <td>{{ item.id_buku }}</td>
                     <td>{{ item.nama_buku }}</td>
                     <td>{{ item.batas_pengembalian }}</td>
                     <td>
-                        <!-- {% if item.keterangan == "BELUM KEMBALI" %} -->
-                        <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ item.nim }}">RETURN</button>
+                        <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ item.id_pinjam }}">RETURN</button>
 
-                        <div class="modal fade" id="confirmModal-{{ item.nim }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                        <div class="modal fade" id="confirmModal-{{ item.id_pinjam }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -69,9 +68,6 @@
                                 </div>  
                             </div>
                         </div>
-                        <!-- {% elif item.keterangan == "KEMBALI" %}
-                            <button class="btn btn-success" disabled>KEMBALI</button> -->
-                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
