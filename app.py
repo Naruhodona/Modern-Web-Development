@@ -205,11 +205,13 @@ def homepage():
 
             # Read filter and category from query parameters
             filter_text = request.args.get('filter', '')  # Default to an empty string if not provided
-            category = request.args.get('category', 'writer')  # Default to 'writer' if not provided
+            category = request.args.get('category', 'all')  # Default to 'all' for the first visit
+
+            first_visit = not (filter_text or category)
 
             books = Buku.query
 
-            if category != 'all':
+            if filter_text or (category != 'all' and filter_text):
                 if category == 'writer':
                     books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
                 elif category == 'title':
@@ -219,15 +221,16 @@ def homepage():
 
             books = books.all()
 
-            if not filter_text and category != 'all':
-                books_to_display = []
-                total_pages = 0
-            else:
-                total_pages = (len(books) + books_per_page - 1) // books_per_page
-                start_index = (page - 1) * books_per_page
-                end_index = start_index + books_per_page
+            total_pages = (len(books) + books_per_page - 1) // books_per_page
+            start_index = (page - 1) * books_per_page
+            end_index = start_index + books_per_page
 
-                books_to_display = books[start_index:end_index]
+            books_to_display = books[start_index:end_index]
+
+            if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
+                error_message = 'Please Enter a Search Term'
+            else:
+                error_message = None
 
             return render_template(
                 'home.html',
@@ -238,7 +241,9 @@ def homepage():
                 total_pages=total_pages,
                 filter=filter_text,
                 category=category,
+                error_message=error_message,
             )
+
     return redirect('/')
 
 # Route ke staff home page
@@ -268,38 +273,44 @@ def peminjaman():
     page = int(request.args.get('page', 1))
     books_per_page = 12
 
-    filter_text = request.args.get('filter')
-    category = request.args.get('category')
+    # Read filter and category from query parameters
+    filter_text = request.args.get('filter', '')  # Default to an empty string if not provided
+    category = request.args.get('category', 'all')  # Default to 'all' for the first visit
+
+    first_visit = not (filter_text or category)
 
     books = Buku.query
 
-    if category == 'writer':
-        books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
-    elif category == 'title':
-        books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
-    elif category == 'genre':
-        books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
+    if filter_text or (category != 'all' and filter_text):
+        if category == 'writer':
+            books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
+        elif category == 'title':
+            books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
+        elif category == 'genre':
+            books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
 
     books = books.all()
 
-    if not filter_text and category != 'all':
-                books_to_display = []
-                total_pages = 0
-    else:
-        total_pages = (len(books) + books_per_page - 1) // books_per_page
-        start_index = (page - 1) * books_per_page
-        end_index = start_index + books_per_page
+    total_pages = (len(books) + books_per_page - 1) // books_per_page
+    start_index = (page - 1) * books_per_page
+    end_index = start_index + books_per_page
 
-        books_to_display = books[start_index:end_index]
+    books_to_display = books[start_index:end_index]
+
+    if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
+        error_message = 'Please Enter a Search Term'
+    else:
+        error_message = None
 
     return render_template(
-        'peminjaman.html',
+        'home.html',
         books=books_to_display,
         total_buku=len(books),
         halaman=page,
         total_pages=total_pages,
         filter=filter_text,
         category=category,
+        error_message=error_message,
     )
 
 @app.route('/insert_peminjaman', methods=['POST'])
