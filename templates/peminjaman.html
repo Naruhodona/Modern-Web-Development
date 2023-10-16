@@ -34,6 +34,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for books..." name="filter">
                         <select class="custom-select" id="categorySelect" name="category">
+                            <option value="all">All</option>
                             <option value="title">Book's Title</option>
                             <option value="genre">Genre</option>
                             <option value="writer">Writer's Name</option>
@@ -84,31 +85,31 @@
                     <ul class="pagination justify-content-center">
                         {% if halaman > 1 %}
                             <li class="page-item">
-                                <a class="page-link" href="/peminjaman?page=1" aria-label="First">
+                                <a class="page-link" href="/peminjaman?page=1&filter={{ filter }}&category={{ category }}" aria-label="First">
                                     <span aria-hidden="true">&laquo;&laquo;</span>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="/peminjaman?page={{ halaman - 1 }}" aria-label="Previous">
+                                <a class="page-link" href="/peminjaman?page={{ halaman - 1 }}&filter={{ filter }}&category={{ category }}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
                         {% endif %}
-    
+
                         {% for page_num in range(1, total_pages + 1) %}
                             <li class="page-item {% if page_num == halaman %}active{% endif %}">
-                                <a class="page-link" href="/peminjaman?page={{ page_num }}">{{ page_num }}</a>
+                                <a class="page-link" href="/peminjaman?page={{ page_num }}&filter={{ filter }}&category={{ category }}">{{ page_num }}</a>
                             </li>
                         {% endfor %}
-    
+
                         {% if halaman < total_pages %}
                             <li class="page-item">
-                                <a class="page-link" href="/peminjaman?page={{ halaman + 1 }}" aria-label="Next">
+                                <a class="page-link" href="/peminjaman?page={{ halaman + 1 }}&filter={{ filter }}&category={{ category }}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="/peminjaman?page={{ total_pages }}" aria-label="Last">
+                                <a class="page-link" href="/peminjaman?page={{ total_pages }}&filter={{ filter }}&category={{ category }}" aria-label="Last">
                                     <span aria-hidden="true">&raquo;&raquo;</span>
                                 </a>
                             </li>
@@ -117,7 +118,7 @@
                 </nav>
             </div>
         </div>
-    </div>    
+    </div>      
 
     {% for book in books %}
     <div class="modal fade" id="bookInfoModal{{ book.id_buku }}" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel" aria-hidden="true">

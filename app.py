@@ -220,7 +220,6 @@ def homepage():
             books = books.all()
 
             if not filter_text and category != 'all':
-                # If the filter is empty and the category is not "All," show no books
                 books_to_display = []
                 total_pages = 0
             else:
@@ -241,8 +240,6 @@ def homepage():
                 category=category,
             )
     return redirect('/')
-
-
 
 # Route ke staff home page
 @app.route('/staff_home')
@@ -285,14 +282,15 @@ def peminjaman():
 
     books = books.all()
 
-    total_pages = (len(books) + books_per_page - 1) // books_per_page
-    start_index = (page - 1) * books_per_page
-    end_index = start_index + books_per_page
+    if not filter_text and category != 'all':
+                books_to_display = []
+                total_pages = 0
+    else:
+        total_pages = (len(books) + books_per_page - 1) // books_per_page
+        start_index = (page - 1) * books_per_page
+        end_index = start_index + books_per_page
 
-    books_to_display = books[start_index:end_index]
-
-    if total_pages == 0:
-        return render_template('peminjaman.html', books=books_to_display, total_buku=len(books), halaman=page, total_pages=total_pages)
+        books_to_display = books[start_index:end_index]
 
     return render_template(
         'peminjaman.html',
