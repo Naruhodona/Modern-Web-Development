@@ -22,7 +22,7 @@
                 <a class="nav-link" href="/registration">Registrasi Member</a>
             </div>
             <div class="nav-item">
-                <a class="nav-link" href="/staff_login">Logout</a>
+                <a class="nav-link" href="/staff_login" onclick="document.cookie = 'username=;'">Logout</a>
             </div>
         </div>
     </nav>
@@ -38,6 +38,7 @@
                     <th scope="col">Book Name</th>
                     <th scope="col">Due Date</th>
                     <th scope="col">Fine Amount</th>
+                    <th scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,6 +49,29 @@
                     <td>{{d.nama_buku}}</td>
                     <td>{{d.batas_pengembalian}}</td>
                     <td>{{d.nominal_denda}}</td>
+                    <td>
+                        <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ d.id_denda }}">PAID</button>
+
+                        <div class="modal fade" id="confirmModal-{{ item.nim }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                        <button type="button" class="btn btn-danger" onclick="executeFunction('{{ d.id_denda}}')">Yes</button>
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 <div class="modal fade" id="nimDetailsModal{{d.id_denda}}" tabindex="-1" role="dialog" aria-labelledby="nimDetailsModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
@@ -63,7 +87,6 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="card">
-                                            <i class="fas fa-user-circle fa-5x mt-3"></i>
                                             <div class="card-body">
                                             <h5 class="card-title">{{d.nama}}</h5>
                                             <p class="card-text">Library Member</p>
@@ -86,43 +109,24 @@
                 {% endfor %}   
             </tbody>
         </table>
-        
-        <div class="modal fade" id="nimDetailsModal2" tabindex="-1" role="dialog" aria-labelledby="nimDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="nimDetailsModalLabel">Detail Pemilik NIM</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Isi dengan detail NIM -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <i class="fas fa-user-circle fa-5x mt-3"></i>
-                                    <div class="card-body">
-                                    <h5 class="card-title">John Doe</h5>
-                                    <p class="card-text">Library Member</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h4>NIM: M02</h4>
-                                <p>Email: email@example.com</p>
-                                <p>Program Studi: IBDA</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
+    <script>
+        function executeFunction(id_denda) {
+            fetch(`/update_denda?id_denda=${id_denda}`, {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Request failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

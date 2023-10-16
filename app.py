@@ -133,12 +133,6 @@ def index():
     check_denda()
     return render_template("log_in.html", log_in = "true")
 
-# Route untuk registration
-@app.route('/registration')
-def registration():
-    check_denda()
-    return render_template('registration.html')
-
 # Route ke profile page
 @app.route('/profile')
 def profile():
@@ -191,11 +185,14 @@ def login_staff():
         
         for staff in staffs:
             if staff.username == username and staff.password == password:
+                response = make_response(redirect('/staff_home'))
+                response.set_cookie('staff_username', staff.username)
                 return render_template('staff_home.html')
         return render_template("staff_login.html", staff_log_in = "false")
     
 @app.route('/home')
 def homepage():
+    check_denda()
     nim = request.cookies.get('nim')
     if nim:
         user = Student.query.get(nim)
@@ -249,70 +246,82 @@ def homepage():
 # Route ke staff home page
 @app.route('/staff_home')
 def staff_home():
-    joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
-    data_denda = []
-    for denda, buku, student in joined_data:
-        today = datetime.now()
-        selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
-        if denda.status !=  "LUNAS":
-            data_denda.append({
-                'id_denda': denda.id_denda,
-                'nim': denda.nim,
-                'nama': student.nama,
-                'id_buku': denda.id_buku,
-                'email' : student.email,
-                'batas_pengembalian': denda.batas_pengembalian,
-                'nominal_denda': selisih_hari*1000,
-                'nama_buku': buku.nama_buku,
-                'prodi': student.prodi
-            })
-    return render_template('staff_home.html', denda=data_denda)
+    check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        user_staff = Staff.query.get(username)
+        if user_staff:
+            joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
+            data_denda = []
+            for denda, buku, student in joined_data:
+                today = datetime.now()
+                selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
+                if denda.status !=  "LUNAS":
+                    data_denda.append({
+                        'id_denda': denda.id_denda,
+                        'nim': denda.nim,
+                        'nama': student.nama,
+                        'id_buku': denda.id_buku,
+                        'email' : student.email,
+                        'batas_pengembalian': denda.batas_pengembalian,
+                        'nominal_denda': selisih_hari*1000,
+                        'nama_buku': buku.nama_buku,
+                        'prodi': student.prodi
+                    })
+            return render_template('staff_home.html', denda=data_denda)
+    return redirect('/staff_login')
 
 @app.route('/peminjaman')
 def peminjaman():
-    page = int(request.args.get('page', 1))
-    books_per_page = 12
+    check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        user_staff = Staff.query.get(username)
+        if user_staff:
+            page = int(request.args.get('page', 1))
+            books_per_page = 12
 
-    # Read filter and category from query parameters
-    filter_text = request.args.get('filter', '')  # Default to an empty string if not provided
-    category = request.args.get('category', 'all')  # Default to 'all' for the first visit
+            # Read filter and category from query parameters
+            filter_text = request.args.get('filter', '')  # Default to an empty string if not provided
+            category = request.args.get('category', 'all')  # Default to 'all' for the first visit
 
-    first_visit = not (filter_text or category)
+            first_visit = not (filter_text or category)
 
-    books = Buku.query
+            books = Buku.query
 
-    if filter_text or (category != 'all' and filter_text):
-        if category == 'writer':
-            books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
-        elif category == 'title':
-            books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
-        elif category == 'genre':
-            books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
+            if filter_text or (category != 'all' and filter_text):
+                if category == 'writer':
+                    books = books.filter(Buku.author.ilike(f"%{filter_text}%"))
+                elif category == 'title':
+                    books = books.filter(Buku.nama_buku.ilike(f"%{filter_text}%"))
+                elif category == 'genre':
+                    books = books.filter(Buku.genre.ilike(f"%{filter_text}%"))
 
-    books = books.all()
+            books = books.all()
 
-    total_pages = (len(books) + books_per_page - 1) // books_per_page
-    start_index = (page - 1) * books_per_page
-    end_index = start_index + books_per_page
+            total_pages = (len(books) + books_per_page - 1) // books_per_page
+            start_index = (page - 1) * books_per_page
+            end_index = start_index + books_per_page
 
-    books_to_display = books[start_index:end_index]
+            books_to_display = books[start_index:end_index]
 
-    if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
-        error_message = 'Please Enter a Search Term'
-    else:
-        error_message = None
+            if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
+                error_message = 'Please Enter a Search Term'
+            else:
+                error_message = None
 
-    return render_template(
-        'home.html',
-        books=books_to_display,
-        total_buku=len(books),
-        halaman=page,
-        total_pages=total_pages,
-        filter=filter_text,
-        category=category,
-        error_message=error_message,
-    )
-
+            return render_template(
+                'peminjaman.html',
+                books=books_to_display,
+                total_buku=len(books),
+                halaman=page,
+                total_pages=total_pages,
+                filter=filter_text,
+                category=category,
+                error_message=error_message,
+            )
+    return redirect('/staff_login')
+    
 @app.route('/insert_peminjaman', methods=['POST'])
 def insert_pinjaman():
     if request.method == "POST":
@@ -335,28 +344,41 @@ def insert_pinjaman():
 # Route ke login staff
 @app.route('/staff_login')
 def staff_login():
+    check_denda()
     return render_template('staff_login.html')
-
-@app.route('/peminjaman')
-def pinjam():
-    return render_template('peminjaman.html')
 
 @app.route('/pengembalian')
 def pengembalian():
-    data_pengembalian = db.session.query(
-        Peminjaman.id_pinjam,
-        Peminjaman.nim,
-        Peminjaman.id_buku,
-        Peminjaman.keterangan,
-        Peminjaman.batas_pengembalian,
-        Peminjaman.keterangan,
-        Buku.nama_buku
-    ).join(
-        Buku, Peminjaman.id_buku == Buku.id_buku
-    ).all()
-    
-    return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
+    check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        user_staff = Staff.query.get(username)
+        if user_staff:
+            data_pengembalian = db.session.query(
+                Peminjaman.id_pinjam,
+                Peminjaman.nim,
+                Peminjaman.id_buku,
+                Peminjaman.keterangan,
+                Peminjaman.batas_pengembalian,
+                Peminjaman.keterangan,
+                Buku.nama_buku
+            ).join(
+                Buku, Peminjaman.id_buku == Buku.id_buku
+            ).filter(Peminjaman.keterangan == "KEMBALI")
+            
+            return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
+    return redirect('/staff_login')
 
+@app.route('/registration')
+def registration():
+    check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        user_staff = Staff.query.get(username)
+        if user_staff:
+
+            return render_template('registration.html')
+    return redirect('/staff_login')
 
 @app.route('/insert_registration', methods=["POST"])
 def insert_registration():
@@ -380,6 +402,17 @@ def update_peminjaman():
         peminjaman_record.keterangan = "KEMBALI"
         buku = Buku.query.filter_by(id_buku=peminjaman_record.id_buku).first()
         buku.stock += 1
+        db.session.commit()
+
+        return "Success"
+   return "Failed to update Peminjaman record."
+
+@app.route('/update_denda', methods=["POST"])
+def update_denda():
+   id_denda = request.args.get('id_denda')
+   denda_record = Denda.query.filter_by(id_denda=id_denda).first()
+   if denda_record:
+        denda_record.status = "LUNAS"
         db.session.commit()
 
         return "Success"
