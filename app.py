@@ -377,7 +377,6 @@ def pengembalian():
                     'id_pinjam': peminjaman.id_pinjam,
 
                 })
-
             return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
     return redirect('/staff_login')
 
