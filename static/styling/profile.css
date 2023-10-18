@@ -53,3 +53,16 @@
 .btn-primary:hover {
     background-color: #2980b9;
 }
+
+#navbar{
+    background-color: #2d3b45;
+}
+
+@media only screen and (max-width: 767px) {
+    .col-md-8{
+        margin-top: 20px;
+    }
+    
+}
+
+

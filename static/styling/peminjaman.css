@@ -22,6 +22,7 @@
 .col-md-4 {
     display: flex;
     flex-direction: column;
+    margin: auto;
 }
 
 .col-md-8 {
@@ -31,4 +32,35 @@
 .custom-card {
     width: 200px;
     height: 350px;
+}
+
+#navbar{
+    background-color: #2d3b45;
+}
+
+#display-books{
+    margin: auto;
+}
+
+@media only screen and (max-width: 569px) {
+    #text-page-number{
+        width: 100%;
+        text-align: center;
+    }
+    .table{
+        overflow: auto;
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+    #row-books{
+        display:grid;
+        grid-template-columns: 33% 33% 33%;
+    }
+}
+
+@media only screen and (min-width: 570px) and (max-width: 767px) {
+    #row-books{
+        display:grid;
+        grid-template-columns: 50% 50%;
+    }
 }

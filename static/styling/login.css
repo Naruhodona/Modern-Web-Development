@@ -12,7 +12,6 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     width: 100%;
     background-color: whitesmoke;
-    
 }
 
 .login-image img {
@@ -49,4 +48,13 @@
 
 .btn-primary:hover {
     background-color: #0056b3;
+}
+
+@media only screen and (max-width: 767px) {
+    .login-image{
+        display: none;
+    }
+    .login-form{
+        margin-left: 0px;
+    }
 }

@@ -131,7 +131,11 @@ def check_denda():
 @app.route('/')
 def index():
     check_denda()
+    nim = request.cookies.get('nim')
+    if nim:
+        return redirect('/home')
     return render_template("log_in.html", log_in = "true")
+    
 
 # Route ke profile page
 @app.route('/profile')
@@ -345,7 +349,11 @@ def insert_pinjaman():
 @app.route('/staff_login')
 def staff_login():
     check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        return redirect('/staff_home')
     return render_template('staff_login.html')
+    
 
 @app.route('/pengembalian')
 def pengembalian():
@@ -369,7 +377,7 @@ def pengembalian():
                     'id_pinjam': peminjaman.id_pinjam,
 
                 })
-            print(data_pengembalian)
+
             return render_template('pengembalian.html', data_pengembalian=data_pengembalian)
     return redirect('/staff_login')
 
@@ -413,14 +421,14 @@ def update_peminjaman():
 
 @app.route('/update_denda', methods=["POST"])
 def update_denda():
-   id_denda = request.args.get('id_denda')
-   denda_record = Denda.query.filter_by(id_denda=id_denda).first()
-   if denda_record:
-        denda_record.status = "LUNAS"
-        db.session.commit()
+    id_denda = request.args.get('id_denda')
+    denda_record = Denda.query.filter_by(id_denda=id_denda).first()
+    if denda_record:
+            denda_record.status = "LUNAS"
+            db.session.commit()
 
-        return "Success"
-   return "Failed to update Peminjaman record."
+            return "Success"
+    return "Failed to update Peminjaman record."
 
 if __name__ == '__main__':
     app.run(debug=True)
