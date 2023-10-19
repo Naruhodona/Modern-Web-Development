@@ -131,11 +131,7 @@ def check_denda():
 @app.route('/')
 def index():
     check_denda()
-    nim = request.cookies.get('nim')
-    if nim:
-        return redirect('/home')
     return render_template("log_in.html", log_in = "true")
-    
 
 # Route ke profile page
 @app.route('/profile')
@@ -229,9 +225,18 @@ def homepage():
             books_to_display = books[start_index:end_index]
 
             if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
-                error_message = 'Please Enter a Search Term'
+                if category == 'genre' or category == 'writer':
+                    error_message = 'Please Enter a Search Term'
+                else:
+                    error_message = 'Please Enter a Search Term for Book Title'
             else:
                 error_message = None
+
+            # Ambil data "genre" unik dalam bentuk CSV
+            genre_options = ",".join(set(result[0] for result in db.session.query(Buku.genre).distinct()))
+
+            # Ambil data "author" unik dalam bentuk CSV
+            author_options = ",".join(set(result[0] for result in db.session.query(Buku.author).distinct()))
 
             return render_template(
                 'home.html',
@@ -243,6 +248,8 @@ def homepage():
                 filter=filter_text,
                 category=category,
                 error_message=error_message,
+                genre_options=genre_options,
+                author_options=author_options,
             )
 
     return redirect('/')
@@ -286,8 +293,8 @@ def peminjaman():
             books_per_page = 12
 
             # Read filter and category from query parameters
-            filter_text = request.args.get('filter', '')  # Default to an empty string if not provided
-            category = request.args.get('category', 'all')  # Default to 'all' for the first visit
+            filter_text = request.args.get('filter', '') 
+            category = request.args.get('category', 'all')
 
             first_visit = not (filter_text or category)
 
@@ -310,9 +317,19 @@ def peminjaman():
             books_to_display = books[start_index:end_index]
 
             if not filter_text and (category != 'all' and not request.args.get('filter')) and not first_visit:
-                error_message = 'Please Enter a Search Term'
+                if category == 'genre' or category == 'writer':
+                    error_message = 'Please Enter a Search Term'
+                else:
+                    error_message = 'Please Enter a Search Term for Book Title'
             else:
                 error_message = None
+
+            # Ambil data "genre" unik dalam bentuk CSV
+            genre_options = ",".join(set(result[0] for result in db.session.query(Buku.genre).distinct()))
+
+            # Ambil data "author" unik dalam bentuk CSV
+            author_options = ",".join(set(result[0] for result in db.session.query(Buku.author).distinct()))
+
 
             return render_template(
                 'peminjaman.html',
@@ -323,7 +340,10 @@ def peminjaman():
                 filter=filter_text,
                 category=category,
                 error_message=error_message,
+                genre_options=genre_options,
+                author_options=author_options,
             )
+
     return redirect('/staff_login')
     
 @app.route('/insert_peminjaman', methods=['POST'])
@@ -349,11 +369,7 @@ def insert_pinjaman():
 @app.route('/staff_login')
 def staff_login():
     check_denda()
-    username = request.cookies.get('staff_username')
-    if username:
-        return redirect('/staff_home')
     return render_template('staff_login.html')
-    
 
 @app.route('/pengembalian')
 def pengembalian():
@@ -420,14 +436,14 @@ def update_peminjaman():
 
 @app.route('/update_denda', methods=["POST"])
 def update_denda():
-    id_denda = request.args.get('id_denda')
-    denda_record = Denda.query.filter_by(id_denda=id_denda).first()
-    if denda_record:
-            denda_record.status = "LUNAS"
-            db.session.commit()
+   id_denda = request.args.get('id_denda')
+   denda_record = Denda.query.filter_by(id_denda=id_denda).first()
+   if denda_record:
+        denda_record.status = "LUNAS"
+        db.session.commit()
 
-            return "Success"
-    return "Failed to update Peminjaman record."
+        return "Success"
+   return "Failed to update Peminjaman record."
 
 if __name__ == '__main__':
     app.run(debug=True)

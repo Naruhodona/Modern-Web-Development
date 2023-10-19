@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="static\styling\peminjaman.css">
 </head>
 <body>
+    
     <nav class="navbar navbar-expand-lg navbar-dark" id="navbar">
         <a class="navbar-brand" href="/staff_home">Calvin Library Staff</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +41,9 @@
             <div class="col-md-8 col-sm-12">
                 <form action="/peminjaman" method="get">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for books..." name="filter">
+                        <div id="searchInput">
+                            <input type="text" class="form-control" placeholder="Search for books..." name="filter">
+                        </div>
                         <select class="custom-select" id="categorySelect" name="category">
                             <option value="all">All</option>
                             <option value="title">Book's Title</option>
@@ -52,20 +55,33 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            </div>     
         </div>
     </div>
-    
     
     <div class="container mt-4">
         {% if error_message %}
             <div class="alert alert-danger" role="alert">
                 {{ error_message }}
             </div>
-        {% elif total_pages == 0 and filter %}
-            <div class="alert alert-warning" role="alert">
-                No Book Available
-            </div>
+        {% elif total_pages == 0 %}
+            {% if category == 'all' %}
+                <div class="alert alert-warning" role="alert">
+                    No Book Available
+                </div>
+            {% elif category == 'title' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Book Title
+                </div>
+            {% elif category == 'genre' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Genre
+                </div>
+            {% elif category == 'writer' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Author
+                </div>
+            {% endif %}
         {% else %}
             <div class="row" id="row-books">
                 {% for book in books %}
@@ -84,14 +100,13 @@
             </div>
         </div>
         {% endif %}
-    </div>
-    
+    </div>    
     
     <div class="container mt-4">
         <div class="row">
-            {% if not error_message %}
+            {% if not error_message and total_pages > 0 %}
                 <div class="col-md-3" id="text-page-number">
-                    <p>Page {% if total_pages > 0 %}{{ halaman }} of {{ total_pages }}{% else %}0 of 0{% endif %}</p>
+                    <p>Page {{ halaman }} of {{ total_pages }}</p>
                 </div>
             {% endif %}
             <div class="col-md-6 text-center">
@@ -160,7 +175,7 @@
     </div>
     {% endfor %}
 
-    <!-- Modal untuk Pinjam buku -->
+    <!-- Modal (pop up) untuk Pinjam buku -->
     <div class="modal fade" id="pinjamModal" tabindex="-1" role="dialog" aria-labelledby="pinjamModalLabel1" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -179,7 +194,7 @@
                         <div class="form-group">
                             <label for="idBuku">ID Buku</label>
                             <input type="text" class="form-control" name="id_buku" id="id_buku" disabled>
-                            <!-- Hidden input to store the book's ID -->
+                            <!-- Hidden input untuk menyimpan book's ID -->
                             <input type="hidden" name="book_id" id="book_id">
                         </div>
                         <div class="form-group">
@@ -218,7 +233,7 @@
                     var bookTitle = button.getAttribute("data-booktitle");
                     document.getElementById("id_buku").value = bookId;
                     document.getElementById("book_id").value = bookId;
-                    // Tambahkan baris ini untuk menghasilkan ID unik
+                    // Baris ini menghasilkan ID unik
                     var uniquePeminjamanID = generateUniqueID();
                     document.getElementById("id_peminjaman").value = uniquePeminjamanID;
                     // document.getElementById("idBukuLabel").textContent = "ID Buku - " + bookTitle;
@@ -229,6 +244,34 @@
             function generateUniqueID() {
                 var timestamp = new Date().getTime();
                 return timestamp;
+            }
+        });  
+
+        categorySelect.addEventListener('change', function() {
+            const selectedCategory = categorySelect.value;
+            const searchInput = document.getElementById('searchInput');
+
+            if (selectedCategory === 'genre' || selectedCategory === 'writer') {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<select class="form-control" name="filter"></select>';
+
+                const filterSelect = searchInput.querySelector('select');
+                const defaultOption = document.createElement('option');
+                defaultOption.text = selectedCategory === 'genre' ? 'Select a genre' : 'Select an author';
+                filterSelect.add(defaultOption);
+
+                // Menguraikan data CSV menjadi array
+                const dataAttribute = selectedCategory === 'genre' ? '{{ genre_options }}' : '{{ author_options }}';
+                const options = dataAttribute.split(',');
+
+                for (const option of options) {
+                    const optionElement = document.createElement('option');
+                    optionElement.text = option;
+                    filterSelect.add(optionElement);
+                }
+            } else {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<input type="text" class="form-control" placeholder="Search for books..." name="filter">';
             }
         });
     </script>    

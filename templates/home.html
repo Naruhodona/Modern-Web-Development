@@ -35,7 +35,9 @@
             <div class="col-md-8 col-sm-12">
                 <form action="/home" method="get">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for books..." name="filter">
+                        <div id="searchInput">
+                            <input type="text" class="form-control" placeholder="Search for books..." name="filter">
+                        </div>
                         <select class="custom-select" id="categorySelect" name="category">
                             <option value="all">All</option>
                             <option value="title">Book's Title</option>
@@ -47,7 +49,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            </div>     
         </div>
     </div>
     
@@ -57,10 +59,24 @@
             <div class="alert alert-danger" role="alert">
                 {{ error_message }}
             </div>
-        {% elif total_pages == 0 and filter %}
-            <div class="alert alert-warning" role="alert">
-                No Book Available
-            </div>
+        {% elif total_pages == 0 %}
+            {% if category == 'all' %}
+                <div class="alert alert-warning" role="alert">
+                    No Book Available
+                </div>
+            {% elif category == 'title' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Book Title
+                </div>
+            {% elif category == 'genre' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Genre
+                </div>
+            {% elif category == 'writer' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Author
+                </div>
+            {% endif %}
         {% else %}
             <div class="row" id="row-books">
                 {% for book in books %}
@@ -79,14 +95,13 @@
             </div>
         </div>
         {% endif %}
-    </div>
-    
+    </div>  
     
     <div class="container mt-4">
         <div class="row">
-            {% if not error_message %}
+            {% if not error_message and total_pages > 0 %}
                 <div class="col-md-3" id="text-page-number">
-                    <p>Page {% if total_pages > 0 %}{{ halaman }} of {{ total_pages }}{% else %}0 of 0{% endif %}</p>
+                    <p>Page {{ halaman }} of {{ total_pages }}</p>
                 </div>
             {% endif %}
             <div class="col-md-6 text-center">
@@ -127,7 +142,7 @@
                 {% endif %}
             </div>
         </div>
-    </div>
+    </div>  
        
     
     {% for book in books %}
@@ -155,6 +170,35 @@
     </div>
     {% endfor %}
 
+    <script>
+        categorySelect.addEventListener('change', function() {
+            const selectedCategory = categorySelect.value;
+            const searchInput = document.getElementById('searchInput');
+
+            if (selectedCategory === 'genre' || selectedCategory === 'writer') {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<select class="form-control" name="filter"></select>';
+
+                const filterSelect = searchInput.querySelector('select');
+                const defaultOption = document.createElement('option');
+                defaultOption.text = selectedCategory === 'genre' ? 'Select a genre' : 'Select an author';
+                filterSelect.add(defaultOption);
+
+                // Menguraikan data CSV menjadi array
+                const dataAttribute = selectedCategory === 'genre' ? '{{ genre_options }}' : '{{ author_options }}';
+                const options = dataAttribute.split(',');
+
+                for (const option of options) {
+                    const optionElement = document.createElement('option');
+                    optionElement.text = option;
+                    filterSelect.add(optionElement);
+                }
+            } else {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<input type="text" class="form-control" placeholder="Search for books..." name="filter">';
+            }
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
