@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Staf Perpustakaan</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static\styling\peminjaman.css">
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark" id="navbar">
+        <a class="navbar-brand" href="/staff_home">Calvin Library Staff</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/staff_home">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/denda">Denda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/pengembalian">Pengembalian</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/registration">Registrasi Member</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/staff_login" onclick="document.cookie = 'staff_username=;'">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Denda</h2>
+        <hr>
+        <div class="table-wrapper">
+            <table class="table" id="table">
+                <thead>
+                    <tr>
+                        <th scope="col">NIM</th>
+                        <th scope="col">Book ID</th>
+                        <th scope="col">Book Name</th>
+                        <th scope="col">Due Date</th>
+                        <th scope="col">Fine Amount</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if denda != [] %}
+                    {% for d in denda %}
+                    <tr>
+                        <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal{{d.id_denda}}">{{d.nim}}</button></th>
+                        <td>{{d.id_buku}}</td>
+                        <td>{{d.nama_buku}}</td>
+                        <td>{{d.batas_pengembalian}}</td>
+                        <td>Rp.{{d.nominal_denda}}</td>
+                        <td>
+                            <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ d.id_denda }}">PAID</button>
+    
+                            <div class="modal fade" id="confirmModal-{{ d.id_denda }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                            <button type="button" class="btn btn-danger" onclick="executeFunction('{{ d.id_denda}}')">Yes</button>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <div class="modal fade" id="nimDetailsModal{{d.id_denda}}" tabindex="-1" role="dialog" aria-labelledby="nimDetailsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="nimDetailsModalLabel">{{d.nim}}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Isi dengan detail NIM -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                <h5 class="card-title">{{d.nama}}</h5>
+                                                <p class="card-text">Library Member</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h4>NIM: {{d.nim}}</h4>
+                                            <p>Email: {{d.email}}</p>
+                                            <p>Program Studi: {{d.prodi}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No Data Available</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function executeFunction(id_denda) {
+            fetch(`/update_denda?id_denda=${id_denda}`, {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Request failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

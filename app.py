@@ -256,33 +256,6 @@ def homepage():
 
 # Route ke staff home page
 @app.route('/staff_home')
-def staff_home():
-    check_denda()
-    username = request.cookies.get('staff_username')
-    if username:
-        user_staff = Staff.query.get(username)
-        if user_staff:
-            joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
-            data_denda = []
-            for denda, buku, student in joined_data:
-                today = datetime.now()
-                selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
-                if denda.status !=  "LUNAS":
-                    data_denda.append({
-                        'id_denda': denda.id_denda,
-                        'nim': denda.nim,
-                        'nama': student.nama,
-                        'id_buku': denda.id_buku,
-                        'email' : student.email,
-                        'batas_pengembalian': denda.batas_pengembalian,
-                        'nominal_denda': selisih_hari*1000,
-                        'nama_buku': buku.nama_buku,
-                        'prodi': student.prodi
-                    })
-            return render_template('staff_home.html', denda=data_denda)
-    return redirect('/staff_login')
-
-@app.route('/peminjaman')
 def peminjaman():
     check_denda()
     username = request.cookies.get('staff_username')
@@ -332,7 +305,7 @@ def peminjaman():
 
 
             return render_template(
-                'peminjaman.html',
+                'staff_home.html',
                 books=books_to_display,
                 total_buku=len(books),
                 halaman=page,
@@ -344,6 +317,34 @@ def peminjaman():
                 author_options=author_options,
             )
 
+    return redirect('/staff_login')
+
+
+@app.route('/denda')
+def staff_home():
+    check_denda()
+    username = request.cookies.get('staff_username')
+    if username:
+        user_staff = Staff.query.get(username)
+        if user_staff:
+            joined_data = db.session.query(Denda, Buku, Student).join(Buku, Denda.id_buku == Buku.id_buku).join(Student, Denda.nim == Student.nim).all()
+            data_denda = []
+            for denda, buku, student in joined_data:
+                today = datetime.now()
+                selisih_hari = (today - datetime.strptime(str(denda.batas_pengembalian), '%Y-%m-%d')).days
+                if denda.status !=  "LUNAS":
+                    data_denda.append({
+                        'id_denda': denda.id_denda,
+                        'nim': denda.nim,
+                        'nama': student.nama,
+                        'id_buku': denda.id_buku,
+                        'email' : student.email,
+                        'batas_pengembalian': denda.batas_pengembalian,
+                        'nominal_denda': selisih_hari*1000,
+                        'nama_buku': buku.nama_buku,
+                        'prodi': student.prodi
+                    })
+            return render_template('denda.html', denda=data_denda)
     return redirect('/staff_login')
     
 @app.route('/insert_peminjaman', methods=['POST'])

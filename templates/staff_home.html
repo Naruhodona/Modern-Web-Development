@@ -20,7 +20,7 @@
                     <a class="nav-link" href="/staff_home">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/peminjaman">Peminjaman</a>
+                    <a class="nav-link" href="/denda">Denda</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/pengembalian">Pengembalian</a>
@@ -36,114 +36,264 @@
     </nav>
 
     <div class="container mt-4">
-        <h2>Denda</h2>
-        <hr>
-        <div class="table-wrapper">
-            <table class="table" id="table">
-                <thead>
-                    <tr>
-                        <th scope="col">NIM</th>
-                        <th scope="col">Book ID</th>
-                        <th scope="col">Book Name</th>
-                        <th scope="col">Due Date</th>
-                        <th scope="col">Fine Amount</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if denda != [] %}
-                    {% for d in denda %}
-                    <tr>
-                        <th scope="row"><button class="btn btn-link" data-toggle="modal" data-target="#nimDetailsModal{{d.id_denda}}">{{d.nim}}</button></th>
-                        <td>{{d.id_buku}}</td>
-                        <td>{{d.nama_buku}}</td>
-                        <td>{{d.batas_pengembalian}}</td>
-                        <td>{{d.nominal_denda}}</td>
-                        <td>
-                            <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ d.id_denda }}">PAID</button>
-    
-                            <div class="modal fade" id="confirmModal-{{ d.id_denda }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Are you sure?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                            <button type="button" class="btn btn-danger" onclick="executeFunction('{{ d.id_denda}}')">Yes</button>
-                                        </div>
-                                    </div>  
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <div class="modal fade" id="nimDetailsModal{{d.id_denda}}" tabindex="-1" role="dialog" aria-labelledby="nimDetailsModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="nimDetailsModalLabel">{{d.nim}}</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <!-- Isi dengan detail NIM -->
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                <h5 class="card-title">{{d.nama}}</h5>
-                                                <p class="card-text">Library Member</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h4>NIM: {{d.nim}}</h4>
-                                            <p>Email: {{d.email}}</p>
-                                            <p>Program Studi: {{d.prodi}}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                </div>
-                            </div>
+        <h2>Search for Books</h2>
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <form action="/staff_home" method="get">
+                    <div class="input-group">
+                        <div id="searchInput">
+                            <input type="text" class="form-control" placeholder="Search for books..." name="filter">
+                        </div>
+                        <select class="custom-select" id="categorySelect" name="category">
+                            <option value="all">All</option>
+                            <option value="title">Book's Title</option>
+                            <option value="genre">Genre</option>
+                            <option value="writer">Writer's Name</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Search</button>
                         </div>
                     </div>
-                    {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="6" style="text-align: center;">No Data Available</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                </form>
+            </div>     
+        </div>
+    </div>
+    
+    <div class="container mt-4">
+        {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+        {% elif total_pages == 0 %}
+            {% if category == 'all' %}
+                <div class="alert alert-warning" role="alert">
+                    No Book Available
+                </div>
+            {% elif category == 'title' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Book Title
+                </div>
+            {% elif category == 'genre' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Genre
+                </div>
+            {% elif category == 'writer' %}
+                <div class="alert alert-danger" role="alert">
+                    Please Enter a Search Term for Author
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="row" id="row-books">
+                {% for book in books %}
+                <div class="col-md-3">
+                    <div class="card mb-4 custom-card" id="display-books">
+                        <img src="{{book.image}}" class="card-img-top" alt="{{ book.nama_buku }}" style="max-width: 200px; max-height: 200px;">
+                        <div class="card-body">
+                            <h6 class="card-title text-center">{{ book.nama_buku }}</h6>
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#bookInfoModal{{ book.id_buku }}">More Info</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>    
+    
+    <div class="container mt-4">
+        <div class="row">
+            {% if not error_message and total_pages > 0 %}
+                <div class="col-md-3" id="text-page-number">
+                    <p>Page {{ halaman }} of {{ total_pages }}</p>
+                </div>
+            {% endif %}
+            <div class="col-md-6 text-center">
+                {% if not error_message %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if halaman > 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="/staff_home?page=1&filter={{ filter }}&category={{ category }}" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="/staff_home?page={{ halaman - 1 }}&filter={{ filter }}&category={{ category }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% for page_num in range(1, total_pages + 1) %}
+                                <li class="page-item {% if page_num == halaman %}active{% endif %}">
+                                    <a class="page-link" href="/staff_home?page={{ page_num }}&filter={{ filter }}&category={{ category }}">{{ page_num }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if halaman < total_pages %}
+                                <li class="page-item">
+                                    <a class="page-link" href="/staff_home?page={{ halaman + 1 }}&filter={{ filter }}&category={{ category }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="/staff_home?page={{ total_pages }}&filter={{ filter }}&category={{ category }}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>      
+
+    {% for book in books %}
+    <div class="modal fade" id="bookInfoModal{{ book.id_buku }}" tabindex="-1" role="dialog" aria-labelledby="bookInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookInfoModalLabel">Book Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Title: {{ book.nama_buku }}</h6>
+                    <p>Author: {{ book.author }}</p>
+                    <p>Genre: {{ book.genre }}</p>
+                    <p>Stock: {% if book.stock > 0 %} Yes {% else %} No {% endif %}</p>
+                    <p>Description: {{ book.description }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pinjamModal" data-bookid="{{ book.id_buku }}" data-booktitle="{{ book.nama_buku }}">Pinjam</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+    <div class="modal fade" id="pinjamModal" tabindex="-1" role="dialog" aria-labelledby="pinjamModalLabel1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pinjamModalLabel">Pinjam Buku</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/insert_peminjaman" method="POST" onsubmit="return validateForm()">
+                        <div class="form-group">
+                            <label for="nim">NIM</label>
+                            <input type="text" class="form-control" name="nim" id="nim" placeholder="Masukkan NIM">
+                        </div>
+                        <div class="form-group">
+                            <label for="idBuku">ID Buku</label>
+                            <input type="text" class="form-control" name="id_buku" id="id_buku" disabled>
+                      
+                            <input type="hidden" name="book_id" id="book_id">
+                        </div>
+                        <div class="form-group">
+                            <label for="tglPeminjaman">Tanggal Peminjaman</label>
+                            <input type="date" class="form-control" name="tglPeminjaman" id="tglPeminjaman">
+                        </div>
+                        <div class="form-group">
+                            <label for="tglPengembalian">Tanggal Pengembalian</label>
+                            <input type="date" class="form-control" name="tglPengembalian" id="tglPengembalian">
+                            <div id="tglPengembalianValidation" style="color: red;"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="keterangan">Keterangan</label>
+                            <select class="form-control" id="keterangan" name="keterangan">
+                                <option value="BELUM KEMBALI">BELUM KEMBALI</option>
+                                <option value="KEMBALI">KEMBALI</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="id_peminjaman" id="id_peminjaman">
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" id="submit-button">OK</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
+
     <script>
-        function executeFunction(id_denda) {
-            fetch(`/update_denda?id_denda=${id_denda}`, {
-                method: 'POST',
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    console.error('Request failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+        document.addEventListener("DOMContentLoaded", function() {
+            var pinjamButtons = document.querySelectorAll('[data-target="#pinjamModal"]');
+            pinjamButtons.forEach(function(button) {
+                button.addEventListener("click", function() {
+                    var bookId = button.getAttribute("data-bookid");
+                    var bookTitle = button.getAttribute("data-booktitle");
+                    document.getElementById("id_buku").value = bookId;
+                    document.getElementById("book_id").value = bookId;
+                
+                    var uniquePeminjamanID = generateUniqueID();
+                    document.getElementById("id_peminjaman").value = uniquePeminjamanID;
+                 
+                });
             });
+    
+          
+            function generateUniqueID() {
+                var timestamp = new Date().getTime();
+                return timestamp;
+            }
+        });  
+
+        categorySelect.addEventListener('change', function() {
+            const selectedCategory = categorySelect.value;
+            const searchInput = document.getElementById('searchInput');
+
+            if (selectedCategory === 'genre' || selectedCategory === 'writer') {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<select class="form-control" name="filter"></select>';
+
+                const filterSelect = searchInput.querySelector('select');
+                const defaultOption = document.createElement('option');
+                defaultOption.text = selectedCategory === 'genre' ? 'Select a genre' : 'Select an author';
+                filterSelect.add(defaultOption);
+
+               
+                const dataAttribute = selectedCategory === 'genre' ? '{{ genre_options }}' : '{{ author_options }}';
+                const options = dataAttribute.split(',');
+
+                for (const option of options) {
+                    const optionElement = document.createElement('option');
+                    optionElement.text = option;
+                    filterSelect.add(optionElement);
+                }
+            } else {
+                searchInput.innerHTML = '';
+                searchInput.innerHTML = '<input type="text" class="form-control" placeholder="Search for books..." name="filter">';
+            }
+        });
+    </script>    
+    <script>
+        function validateForm() {
+            const tglPeminjaman = document.getElementById('tglPeminjaman').value;
+            const tglPengembalian = document.getElementById('tglPengembalian').value;
+            const tglPengembalianValidation = document.getElementById('tglPengembalianValidation');
+    
+            if (new Date(tglPengembalian) < new Date(tglPeminjaman)) {
+                tglPengembalianValidation.textContent = '*Tanggal Pengembalian harus setelah Tanggal Peminjaman.';
+                return false; 
+            } else {
+                tglPengembalianValidation.textContent = ''; 
+            }
+    
+            return true; 
         }
     </script>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
