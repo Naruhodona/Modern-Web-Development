@@ -157,8 +157,8 @@ def profile():
                         'nama_buku': buku.nama_buku
                     })
             return render_template('profile.html', data_user=data_user, data_denda=data_denda)
-    else:
-        return redirect('/')
+    
+    return redirect('/')
     
 
 @app.route('/login', methods=['POST'])
@@ -256,7 +256,7 @@ def homepage():
 
 # Route ke staff home page
 @app.route('/staff_home')
-def peminjaman():
+def staff_home():
     check_denda()
     username = request.cookies.get('staff_username')
     if username:
@@ -321,7 +321,7 @@ def peminjaman():
 
 
 @app.route('/denda')
-def staff_home():
+def denda():
     check_denda()
     username = request.cookies.get('staff_username')
     if username:
@@ -424,27 +424,27 @@ def insert_registration():
     
 @app.route('/update_peminjaman', methods=["POST"])
 def update_peminjaman():
-   id_pinjam = request.args.get('id_pinjam')
-   peminjaman_record = Peminjaman.query.filter_by(id_pinjam=id_pinjam).first()
-   if peminjaman_record:
+    id_pinjam = request.args.get('id_pinjam')
+    peminjaman_record = Peminjaman.query.filter_by(id_pinjam=id_pinjam).first()
+    if peminjaman_record:
         peminjaman_record.keterangan = "KEMBALI"
         buku = Buku.query.filter_by(id_buku=peminjaman_record.id_buku).first()
         buku.stock += 1
         db.session.commit()
 
         return "Success"
-   return "Failed to update Peminjaman record."
+    return "Failed to update Peminjaman record."
 
 @app.route('/update_denda', methods=["POST"])
 def update_denda():
-   id_denda = request.args.get('id_denda')
-   denda_record = Denda.query.filter_by(id_denda=id_denda).first()
-   if denda_record:
+    id_denda = request.args.get('id_denda')
+    denda_record = Denda.query.filter_by(id_denda=id_denda).first()
+    if denda_record:
         denda_record.status = "LUNAS"
         db.session.commit()
 
         return "Success"
-   return "Failed to update Peminjaman record."
+    return "Failed to update Peminjaman record."
 
 if __name__ == '__main__':
     app.run(debug=True)
