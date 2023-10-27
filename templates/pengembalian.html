@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Staf Perpustakaan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static\styling\peminjaman.css">
+</head>
+<body>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark" id="navbar">
+        <a class="navbar-brand" href="/staff_home">Calvin Library Staff</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/staff_home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/denda">Denda</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/pengembalian">Pengembalian</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/registration">Registrasi Member</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/staff_login" onclick="document.cookie = 'staff_username=;'">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2>Data buku yang sedang dipinjam</h2>
+        <hr>
+        <div class="table-wrapper">
+            <table class="table" id="table">
+                <thead>
+                    <tr>
+                        <th scope="col">NIM</th>
+                        <th scope="col">Book ID</th>
+                        <th scope="col">Book Name</th>
+                        <th scope="col">Due Date</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data_pengembalian %}
+                    <tr>
+                        <th scope="row">{{ item.nim}}</button></th>
+                        <td>{{ item.id_buku }}</td>
+                        <td>{{ item.nama_buku }}</td>
+                        <td>{{ item.batas_pengembalian }}</td>
+                        <td>
+                            <button class="btn btn-primary" style="background-color: red;" data-toggle="modal" data-target="#confirmModal-{{ item.id_pinjam }}">RETURN</button>
+    
+                            <div class="modal fade" id="confirmModal-{{ item.id_pinjam }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                            <button type="button" class="btn btn-danger" onclick="executeFunction('{{ item.id_pinjam}}')">Yes</button>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</body>
+<script>
+    function executeFunction(id_pinjam) {
+        fetch(`/update_peminjaman?id_pinjam=${id_pinjam}`, {
+            method: 'POST',
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                console.error('Request failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</html>

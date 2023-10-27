@@ -1,0 +1,60 @@
+.container {
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-body {
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    background-color: whitesmoke;
+}
+
+.login-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.login-form h1 {
+    font-size: 45px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-form {
+    width: 100%;
+    margin-left: 30px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.btn-primary {
+    background-color: #007BFF;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+@media only screen and (max-width: 767px) {
+    .login-image{
+        display: none;
+    }
+    .login-form{
+        margin-left: 0px;
+    }
+}
