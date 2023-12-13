@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Admin Endpoint</title>
+</head>
+<body>
+  <h1>Login Admin</h1>
+  <form id="loginForm" method="Post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username"><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"><br><br>
+    <button type="button" onclick="login()">Login</button>
+  </form>
+
+  <script>
+    function login() {
+      // Ambil nilai username dan password dari form
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+
+      // Buat objek data untuk dikirim sebagai JSON
+      var data = {
+        username: username,
+        password: password
+      };
+
+      // Kirim permintaan POST ke endpoint /admin menggunakan Fetch API
+      fetch('/admin-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        // Tampilkan hasil dari permintaan
+        console.log(data);
+        if (data.admin) {
+          alert('Login successful! Admin ID: ' + data.admin.id_admin);
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(function(error) {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+</body>
+</html>

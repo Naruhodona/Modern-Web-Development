@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inserted Menu</title>
+</head>
+<body>
+    <h1>Inserted Menu</h1>
+    <ul>
+        {% for menu in menus %}
+        <li>
+            <h3>ID Menu: {{ menu.id_menu }}</h3>
+            <p>Nama Menu: {{ menu.nama_menu }}</p>
+            <p>Harga: {{ menu.harga }}</p>
+            <p>Tipe: {{ menu.tipe }}</p>
+            {% if menu.gambar %}
+                <img src="{{ menu.image_base64 }}" alt="Gambar Menu">
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

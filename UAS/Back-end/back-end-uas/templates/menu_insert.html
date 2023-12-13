@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert Menu</title>
+</head>
+<body>
+    <h1>Insert Menu</h1>
+    <form id="menuForm" method="POST" action="/menu-insert" enctype="multipart/form-data">
+        <label for="idMenu">ID Menu:</label><br>
+        <input type="text" id="idMenu" name="idMenu"><br><br>
+        
+        <label for="namaMenu">Nama Menu:</label><br>
+        <input type="text" id="namaMenu" name="namaMenu"><br><br>
+        
+        <label for="hargaMenu">Harga:</label><br>
+        <input type="number" id="hargaMenu" name="hargaMenu"><br><br>
+        
+        <label for="tipeMenu">Tipe:</label><br>
+        <select id="tipeMenu" name="tipeMenu">
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
+        </select><br><br>
+
+        <label for="gambarMenu">Gambar:</label><br>
+        <input type="file" id="gambarMenu" name="gambarMenu"><br><br>
+        
+        <button type="submit">Insert Menu</button>
+    </form>
+</body>
+</html>
