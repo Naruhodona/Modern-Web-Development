@@ -6,10 +6,7 @@
 </head>
 <body>
     <h1>Insert Menu</h1>
-    <form id="menuForm" method="POST" action="/menu-insert" enctype="multipart/form-data">
-        <label for="idMenu">ID Menu:</label><br>
-        <input type="text" id="idMenu" name="idMenu"><br><br>
-        
+    <form id="menuForm">
         <label for="namaMenu">Nama Menu:</label><br>
         <input type="text" id="namaMenu" name="namaMenu"><br><br>
         
@@ -25,7 +22,45 @@
         <label for="gambarMenu">Gambar:</label><br>
         <input type="file" id="gambarMenu" name="gambarMenu"><br><br>
         
-        <button type="submit">Insert Menu</button>
+        <button type="button" onclick="insertMenu()">Insert Menu</button>
     </form>
+
+    <script>
+        function insertMenu() {
+            var namaMenu = document.getElementById('namaMenu').value;
+            var hargaMenu = document.getElementById('hargaMenu').value;
+            var tipeMenu = document.getElementById('tipeMenu').value;
+            var gambarMenuInput = document.getElementById('gambarMenu').files[0];
+
+            var reader = new FileReader();
+            reader.readAsDataURL(gambarMenuInput);
+            reader.onload = function () {
+                var base64Image = reader.result.split(',')[1];
+
+                var data = {
+                    namaMenu: namaMenu,
+                    hargaMenu: hargaMenu,
+                    tipeMenu: tipeMenu,
+                    gambarMenu: base64Image
+                };
+
+                fetch('/menu-insert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Atur Content-Type ke application/json
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            };
+        }
+    </script>
 </body>
 </html>

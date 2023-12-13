@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Inserted Menu</title>
+    <title>Menu</title>
 </head>
 <body>
     <h1>Inserted Menu</h1>
@@ -16,8 +16,36 @@
             {% if menu.gambar %}
                 <img src="{{ menu.image_base64 }}" alt="Gambar Menu">
             {% endif %}
+            <!-- Tombol Edit -->
+            <button onclick="editMenu('{{ menu.id_menu }}')">Edit</button>
+            <!-- Tombol Delete -->
+            <button onclick="deleteMenu('{{ menu.id_menu }}')">Delete</button>
         </li>
         {% endfor %}
     </ul>
+
+    <script>
+        function editMenu(id_menu) {
+            // Redirect ke halaman edit dengan ID menu yang dipilih
+            window.location.href = '/menu-edit/' + id_menu;
+        }
+
+        function deleteMenu(id_menu) {
+            if (confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
+                fetch('/menu-delete/' + id_menu, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // Refresh halaman setelah penghapusan berhasil
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
 </body>
 </html>

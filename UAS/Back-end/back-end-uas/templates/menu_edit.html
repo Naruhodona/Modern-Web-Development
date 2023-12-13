@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Menu</title>
+</head>
+<body>
+    <h1>Edit Menu</h1>
+    <form id="editMenuForm">
+        <label for="idMenu">ID Menu:</label><br>
+        <input type="text" id="idMenu" name="idMenu" readonly><br><br>
+        
+        <label for="namaMenu">Nama Menu:</label><br>
+        <input type="text" id="namaMenu" name="namaMenu"><br><br>
+        
+        <label for="hargaMenu">Harga:</label><br>
+        <input type="number" id="hargaMenu" name="hargaMenu"><br><br>
+        
+        <label for="tipeMenu">Tipe:</label><br>
+        <select id="tipeMenu" name="tipeMenu">
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
+        </select><br><br>
+
+        <label for="gambarMenu">Gambar:</label><br>
+        <input type="file" id="gambarMenu" name="gambarMenu"><br><br>
+        <img id="previewImage" src="#" alt="Gambar Menu" style="display: none;"><br><br>
+        
+        <button type="button" onclick="updateMenu()">Update Menu</button>
+    </form>
+
+    <script>
+        // Ambil ID menu dari URL dan isi formulir edit dengan data menu
+        var idMenu = window.location.href.split('/').pop();
+        document.getElementById('idMenu').value = idMenu;
+
+        // Fungsi untuk mengambil detail menu dari server dan mengisi formulir
+        function fetchMenuDetails(idMenu) {
+            fetch('/get-menu/' + idMenu)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('namaMenu').value = data.nama_menu;
+                    document.getElementById('hargaMenu').value = data.harga;
+                    document.getElementById('tipeMenu').value = data.tipe;
+                    
+                    if (data.gambar) {
+                        document.getElementById('previewImage').setAttribute('src', data.gambar);
+                        document.getElementById('previewImage').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Panggil fungsi untuk mengisi formulir saat halaman dimuat
+        fetchMenuDetails(idMenu);
+
+        // Fungsi untuk mengubah gambar menjadi Base64
+        document.getElementById('gambarMenu').addEventListener('change', function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('previewImage').setAttribute('src', e.target.result);
+                document.getElementById('previewImage').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Fungsi untuk mengirim data menu yang diubah ke server Flask
+        function updateMenu() {
+            var namaMenu = document.getElementById('namaMenu').value;
+            var hargaMenu = document.getElementById('hargaMenu').value;
+            var tipeMenu = document.getElementById('tipeMenu').value;
+            var gambarMenuInput = document.getElementById('gambarMenu').files[0];
+
+            if (gambarMenuInput) {
+                var reader = new FileReader();
+                reader.readAsDataURL(gambarMenuInput);
+                reader.onload = function () {
+                    var base64Image = reader.result.split(',')[1];
+
+                    var data = {
+                        idMenu: idMenu,
+                        namaMenu: namaMenu,
+                        hargaMenu: hargaMenu,
+                        tipeMenu: tipeMenu,
+                        gambarMenu: base64Image
+                    };
+
+                    sendUpdateRequest(data);
+                };
+            } else {
+                var data = {
+                    idMenu: idMenu,
+                    namaMenu: namaMenu,
+                    hargaMenu: hargaMenu,
+                    tipeMenu: tipeMenu
+                };
+
+                sendUpdateRequest(data);
+            }
+        }
+
+        function sendUpdateRequest(data) {
+            fetch('/menu-update/' + idMenu, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                // Redirect ke halaman lain setelah update berhasil
+                window.location.href = '/show-menu';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+    </script>
+</body>
+</html>

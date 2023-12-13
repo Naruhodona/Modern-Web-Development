@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Input Form</title>
+</head>
+<body>
+    <h1>Order Form</h1>
+
+    <form id="orderForm" method="POST" action="/submit_order">
+        <label for="reservasi">Nama Reservasi:</label>
+        <input type="text" id="reservasi" name="reservasi"><br><br>
+
+        <label for="tables">Pilih Nomor Meja:</label>
+        <select id="tables" name="tables">
+            {% for table_number in table_numbers %}
+                <option value="{{ table_number }}">{{ table_number }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label>Daftar Menu:</label>
+        <ul>
+            {% for menu_name in menu_names %}
+             
+                    <input type="checkbox" name="selected_menu[]" value="{{ menu_name }}">
+                    {{ menu_name }}
+               
+            {% endfor %}
+        </ul><br>
+
+        <label for="status_order">Status Order:</label>
+        <select id="status_order" name="status_order">
+            <option value="Terbuka">Terbuka</option>
+            <option value="Tertutup">Tertutup</option>
+        </select><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            // Get form data
+            const formData = new FormData(this);
+            const data = {};
+    
+            // Convert FormData to JSON
+            formData.forEach(function(value, key){
+                if (data[key]) {
+                    if (!Array.isArray(data[key])) {
+                        data[key] = [data[key]];
+                    }
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            });
+    
+            // Send data as JSON using fetch
+            fetch('/submit_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                // Handle response
+                console.log('Response:', response);
+                // Redirect to /order if the submission was successful (status code 200-299)
+                if (response.ok) {
+                    window.location.href = '/order';
+                }
+            })
+            .catch(error => {
+                // Handle error
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
