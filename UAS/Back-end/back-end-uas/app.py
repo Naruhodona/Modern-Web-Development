@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, session, redirect, jsonify
+from flask import Flask, render_template, request, make_response, session, redirect, jsonify, url_for
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import base64
@@ -46,7 +46,7 @@ class Order(db.Model):
     no_meja = db.Column(db.Integer, db.ForeignKey('meja.no_meja'))
     nama_reservasi = db.Column(db.String(255))
 
-# Pengambilan data dalam bentuk JSON
+# Pengambilan data dalam bentuk JSON untuk Admin
 @app.route('/admin-login', methods=['POST'])
 def login():
     data = request.json 
@@ -68,11 +68,11 @@ def login():
 def admin_login():
     return render_template('staff_login.html')
 
-# Pengambilan data dalam bentuk JSON
+# Pengambilan data dalam bentuk JSON untuk Menu
 @app.route('/menu-insert', methods=['POST'])
 def insert_menu():
     try:
-        data = request.json  # Mengambil data JSON dari permintaan
+        data = request.json
 
         namaMenu = data['namaMenu']
         hargaMenu = int(data['hargaMenu'])
@@ -110,91 +110,218 @@ def menu_insert():
     return render_template('menu_insert.html')
 
 # Rute untuk mengedit menu
-@app.route('/menu-update/<id_menu>', methods=['PUT'])
-def update_menu(id_menu):
-    try:
-        data = request.json 
+# @app.route('/menu-update/<id_menu>', methods=['PUT'])
+# def update_menu(id_menu):
+#     try:
+#         data = request.json 
 
-        menu = Menu.query.filter_by(id_menu=id_menu).first()
+#         menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-        if menu:
-            menu.nama_menu = data.get('namaMenu', menu.nama_menu)
-            menu.harga = int(data.get('hargaMenu', menu.harga))
-            menu.tipe = data.get('tipeMenu', menu.tipe)
+#         if menu:
+#             menu.nama_menu = data.get('namaMenu', menu.nama_menu)
+#             menu.harga = int(data.get('hargaMenu', menu.harga))
+#             menu.tipe = data.get('tipeMenu', menu.tipe)
 
-            # Update gambar jika ada perubahan
-            if 'gambarMenu' in data:
-                gambarMenu_base64 = data['gambarMenu']
-                gambarMenu = base64.b64decode(gambarMenu_base64)
-                menu.gambar = gambarMenu
+#             # Update gambar jika ada perubahan
+#             if 'gambarMenu' in data:
+#                 gambarMenu_base64 = data['gambarMenu']
+#                 gambarMenu = base64.b64decode(gambarMenu_base64)
+#                 menu.gambar = gambarMenu
 
-            db.session.commit()
+#             db.session.commit()
 
-            return jsonify({'message': 'Menu updated successfully'}), 200
-        else:
-            return jsonify({'message': 'Menu not found'}), 404
+#             return jsonify({'message': 'Menu updated successfully'}), 200
+#         else:
+#             return jsonify({'message': 'Menu not found'}), 404
 
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
+#     except Exception as e:
+#         return jsonify({'message': str(e)}), 500
 
 # Rute pengambilan menu yang ingin di edit sesuai dengan id nya
-@app.route('/get-menu/<id_menu>', methods=['GET'])
-def get_menu(id_menu):
-    try:
-        menu = Menu.query.filter_by(id_menu=id_menu).first()
+# @app.route('/get-menu/<id_menu>', methods=['GET'])
+# def get_menu(id_menu):
+#     try:
+#         menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-        if menu:
-            # Mengubah data gambar BLOB ke format base64
-            if menu.gambar:
-                image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
-                menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
+#         if menu:
+#             # Mengubah data gambar BLOB ke format base64
+#             if menu.gambar:
+#                 image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
+#                 menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
 
-            return jsonify({
-                'id_menu': menu.id_menu,
-                'nama_menu': menu.nama_menu,
-                'harga': menu.harga,
-                'tipe': menu.tipe,
-                'gambar': menu.image_base64 if menu.gambar else None
-            }), 200
-        else:
-            return jsonify({'message': 'Menu not found'}), 404
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
+#             return jsonify({
+#                 'id_menu': menu.id_menu,
+#                 'nama_menu': menu.nama_menu,
+#                 'harga': menu.harga,
+#                 'tipe': menu.tipe,
+#                 'gambar': menu.image_base64 if menu.gambar else None
+#             }), 200
+#         else:
+#             return jsonify({'message': 'Menu not found'}), 404
+#     except Exception as e:
+#         return jsonify({'message': str(e)}), 500
 
-# Rute uji coba untuk mengecek apakah editnya berfungsi atau tidak
-@app.route('/menu-edit/<id_menu>', methods=['GET'])
-def show_edit_menu(id_menu):
-    return render_template('menu_edit.html', id_menu=id_menu)
+# # Rute uji coba untuk mengecek apakah editnya berfungsi atau tidak
+# @app.route('/menu-edit/<id_menu>', methods=['GET'])
+# def show_edit_menu(id_menu):
+#     return render_template('menu_edit.html', id_menu=id_menu)
 
-@app.route('/menu-delete/<id_menu>', methods=['DELETE'])
-def delete_menu(id_menu):
-    try:
-        menu = Menu.query.filter_by(id_menu=id_menu).first()
+# @app.route('/menu-delete/<id_menu>', methods=['DELETE'])
+# def delete_menu(id_menu):
+#     try:
+#         menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-        if menu:
-            db.session.delete(menu)
-            db.session.commit()
-            return jsonify({'message': 'Menu deleted successfully'}), 200
-        else:
-            return jsonify({'message': 'Menu not found'}), 404
+#         if menu:
+#             db.session.delete(menu)
+#             db.session.commit()
+#             return jsonify({'message': 'Menu deleted successfully'}), 200
+#         else:
+#             return jsonify({'message': 'Menu not found'}), 404
 
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
+#     except Exception as e:
+#         return jsonify({'message': str(e)}), 500
 
-@app.route('/show-menu', methods=['GET'])
-def show_inserted_menu():
-    try:
-        menus = Menu.query.all()
+@app.route('/menu/<id_menu>', methods=['GET', 'PUT', 'DELETE'])
+def selected_menu(id_menu):
+    if request.method == 'GET':
+        try:
+            menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-        for menu in menus:
-            if menu.gambar:
+            if menu:
                 # Mengubah data gambar BLOB ke format base64
-                image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
-                menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
+                if menu.gambar:
+                    image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
+                    menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
 
-        return render_template('menu.html', menus=menus)
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
+                return jsonify({
+                    'id_menu': menu.id_menu,
+                    'nama_menu': menu.nama_menu,
+                    'harga': menu.harga,
+                    'tipe': menu.tipe,
+                    'gambar': menu.image_base64 if menu.gambar else None
+                }), 200
+            else:
+                return jsonify({'message': 'Menu not found'}), 404
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
+    elif request.method == 'PUT':
+        try:
+            data = request.json 
+
+            menu = Menu.query.filter_by(id_menu=id_menu).first()
+
+            if menu:
+                menu.nama_menu = data.get('nama_menu', menu.nama_menu)  # Perbaikan nama field
+                menu.harga = int(data.get('harga', menu.harga))  # Perbaikan nama field
+                menu.tipe = data.get('tipe', menu.tipe)  # Perbaikan nama field
+
+                # Update gambar jika ada perubahan
+                if 'gambar' in data:  # Perbaikan nama field
+                    gambarMenu_base64 = data['gambar']
+                    gambarMenu = base64.b64decode(gambarMenu_base64)
+                    menu.gambar = gambarMenu
+
+                db.session.commit()
+
+                return jsonify({'message': 'Menu updated successfully'}), 200
+            else:
+                return jsonify({'message': 'Menu not found'}), 404
+
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
+    elif request.method == 'DELETE':
+        try:
+            menu = Menu.query.filter_by(id_menu=id_menu).first()
+
+            if menu:
+                db.session.delete(menu)
+                db.session.commit()
+                return jsonify({'message': 'Menu deleted successfully'}), 200
+            else:
+                return jsonify({'message': 'Menu not found'}), 404
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
+    else:
+        return jsonify({'message': 'Method not allowed'}), 405
+
+@app.route('/menu', methods=['POST', 'GET'])
+def menu():
+    if request.method == 'GET':
+        try:
+            menus = Menu.query.all()
+
+            menu_list = []
+            for menu in menus:
+                menu_data = {
+                    'id_menu': menu.id_menu,
+                    'nama_menu': menu.nama_menu,
+                    'harga': menu.harga,
+                    'tipe': menu.tipe
+                }
+
+                if menu.gambar:
+                    image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
+                    menu_data['image_base64'] = f"data:image/jpeg;base64,{image_base64}"
+
+                menu_list.append(menu_data)
+
+            return jsonify({'menus': menu_list}), 200
+
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
+    elif request.method == 'POST':
+        try:
+            data = request.json
+
+            namaMenu = data['namaMenu']
+            hargaMenu = int(data['hargaMenu'])
+            tipeMenu = data['tipeMenu']
+
+            # Ambil gambar dari data JSON sebagai string Base64
+            gambarMenu_base64 = data['gambarMenu']
+
+            # Konversi gambar dari Base64 ke bentuk binary
+            gambarMenu = base64.b64decode(gambarMenu_base64)
+            jumlah_menu = Menu.query.filter_by(tipe=tipeMenu).count()
+            
+            if tipeMenu == 'Minuman':
+                id_menu = 'B' + str(jumlah_menu + 1)
+            else:
+                id_menu = 'F' + str(jumlah_menu + 1)
+
+            menu = Menu(
+                id_menu=id_menu,
+                nama_menu=namaMenu,
+                harga=hargaMenu,
+                tipe=tipeMenu,
+                gambar=gambarMenu 
+            )
+            db.session.add(menu)
+            db.session.commit()
+
+            return jsonify({'message': 'Menu inserted successfully'}), 200
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
+
+# Testing
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
+# @app.route('/show-menu', methods=['GET'])
+# def show_menu():
+#     try:
+#         menus = Menu.query.all()
+
+#         for menu in menus:
+#             if menu.gambar:
+#                 # Mengubah data gambar BLOB ke format base64
+#                 image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
+#                 menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
+
+#         return render_template('menu.html', menus=menus)
+#     except Exception as e:
+#         return jsonify({'message': str(e)}), 500
 
 @app.route('/order')
 def order():
