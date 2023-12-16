@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, make_response, session, redirect, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import base64
 
 app = Flask(__name__)
+CORS(app)
 
 app.secret_key = 'UASWeb'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/restoran'
@@ -82,7 +84,7 @@ def insert_menu():
         # Konversi gambar dari Base64 ke bentuk binary
         gambarMenu = base64.b64decode(gambarMenu_base64)
         jumlah_menu = Menu.query.filter_by(tipe=tipeMenu).count()
-        # Menentukan awalan id_menu berdasarkan tipe menu
+        
         if tipeMenu == 'Minuman':
             id_menu = 'B' + str(jumlah_menu + 1)
         else:
@@ -94,7 +96,7 @@ def insert_menu():
             nama_menu=namaMenu,
             harga=hargaMenu,
             tipe=tipeMenu,
-            gambar=gambarMenu  # Simpan gambar dalam format BLOB
+            gambar=gambarMenu 
         )
         db.session.add(menu)
         db.session.commit()
@@ -111,7 +113,7 @@ def menu_insert():
 @app.route('/menu-update/<id_menu>', methods=['PUT'])
 def update_menu(id_menu):
     try:
-        data = request.json  # Mengambil data JSON dari permintaan
+        data = request.json 
 
         menu = Menu.query.filter_by(id_menu=id_menu).first()
 
