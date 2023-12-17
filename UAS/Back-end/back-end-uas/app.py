@@ -216,7 +216,7 @@ def selected_menu(id_menu):
                 menu.tipe = data.get('tipe', menu.tipe)  # Perbaikan nama field
 
                 # Update gambar jika ada perubahan
-                if 'gambar' in data:  # Perbaikan nama field
+                if data['gambar']:  # Perbaikan nama field
                     gambarMenu_base64 = data['gambar']
                     gambarMenu = base64.b64decode(gambarMenu_base64)
                     menu.gambar = gambarMenu
@@ -272,11 +272,11 @@ def menu():
     elif request.method == 'POST':
         try:
             data = request.json
-
+                        
             namaMenu = data['namaMenu']
             hargaMenu = int(data['hargaMenu'])
             tipeMenu = data['tipeMenu']
-
+            
             # Ambil gambar dari data JSON sebagai string Base64
             gambarMenu_base64 = data['gambarMenu']
 
