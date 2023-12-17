@@ -343,7 +343,7 @@ def selected_menu(id_menu):
                 menu.tipe = data.get('tipe', menu.tipe)  # Perbaikan nama field
 
                 # Update gambar jika ada perubahan
-                if data.get('gambar'):
+                if data['gambar']:
                     gambarMenu_base64 = data['gambar']
                     gambarMenu = base64.b64decode(gambarMenu_base64)
                     menu.gambar = gambarMenu
@@ -477,6 +477,47 @@ def order():
 
         return jsonify(response_data)
 
+@app.route('/order/<string:order_id>', methods=['GET', 'PUT'])
+def selected_order(order_id):
+    if request.method == 'GET':
+        orders = Order.query.filter_by(order_id=order_id).all()
+
+        orders_details = []
+
+        for order in orders:
+            order_detail = {
+                'kode_order': order.kode_order,
+                'order_id': order.order_id,
+                'status_order': order.status_order,
+                'no_meja': order.no_meja,
+                'nama_reservasi': order.nama_reservasi,
+                'id_menu': order.id_menu 
+            }
+            orders_details.append(order_detail)
+
+        return jsonify(orders_details)
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        kode_order = data.get('kode_order')
+        no_meja = data.get('no_meja')
+
+        if kode_order:
+            updated_orders = Order.query.filter_by(order_id=order_id).all()
+            for order in updated_orders:
+                order.status_order = "Tertutup"
+
+            if no_meja:
+                meja = Meja.query.filter_by(no_meja=no_meja).first()
+                if meja:
+                    meja.status = "AVAILABLE"
+
+            db.session.commit()
+            return jsonify({'message': 'Order status and Meja status updated successfully',
+                            'Meja status': meja.status if meja else None})
+        else:
+            return jsonify({'error': 'Missing kode_order in the request'}), 400
+
 # @app.route('/list_order', methods=['GET'])
 # def list_orders():
 #     # Grouping orders by 'order_id' and fetching all orders
@@ -544,47 +585,6 @@ def order():
 #             db.session.commit()
 
 #     return "Done"
-
-@app.route('/order/<string:order_id>', methods=['GET', 'POST'])
-def selected_order(order_id):
-    if request.method == 'GET':
-        orders = Order.query.filter_by(order_id=order_id).all()
-
-        orders_details = []
-
-        for order in orders:
-            order_detail = {
-                'kode_order': order.kode_order,
-                'order_id': order.order_id,
-                'status_order': order.status_order,
-                'no_meja': order.no_meja,
-                'nama_reservasi': order.nama_reservasi,
-                'id_menu': order.id_menu 
-            }
-            orders_details.append(order_detail)
-
-        return jsonify(orders_details)
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        kode_order = data.get('kode_order')
-        no_meja = data.get('no_meja')
-
-        if kode_order:
-            updated_orders = Order.query.filter_by(order_id=order_id).all()
-            for order in updated_orders:
-                order.status_order = "Tertutup"
-
-            if no_meja:
-                meja = Meja.query.filter_by(no_meja=no_meja).first()
-                if meja:
-                    meja.status = "AVAILABLE"
-
-            db.session.commit()
-            return jsonify({'message': 'Order status and Meja status updated successfully',
-                            'Meja status': meja.status if meja else None})
-        else:
-            return jsonify({'error': 'Missing kode_order in the request'}), 400
 
 # Route mengambil seluruh meja
 @app.route('/meja', methods=['GET'])
