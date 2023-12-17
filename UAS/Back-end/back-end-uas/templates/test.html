@@ -2,63 +2,172 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Show Menu</title>
+    <title>Order Input Form</title>
 </head>
 <body>
-    <h1>Menu</h1>
-    <ul id="menuLists">
-        <!-- Daftar menu akan ditampilkan di sini -->
-    </ul>
+    <h1>Order Form</h1>
+
+    <form id="orderForm" method="POST" action="/order">
+        <label for="reservasi">Nama Reservasi:</label>
+        <input type="text" id="reservasi" name="reservasi"><br><br>
+    
+        <label for="tables">Pilih Nomor Meja:</label>
+        <select id="tables" name="tables">
+            <!-- Table numbers will be populated dynamically -->
+        </select><br><br>
+    
+        <label>Daftar Menu:</label>
+        <ul id="menuList">
+            <!-- Menu items will be populated dynamically -->
+        </ul><br>
+    
+        <label for="status_order">Status Order:</label>
+        <select id="status_order" name="status_order">
+            <option value="Terbuka">Terbuka</option>
+            <option value="Tertutup">Tertutup</option>
+        </select><br><br>
+    
+        <input type="submit" value="Submit">
+    </form>
+    
+
+    <div id="orderList">
+        <!-- Daftar pesanan akan ditambahkan di sini -->
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch('/menu') // Mengambil data menu dari API Flask
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    const menuList = document.getElementById('menuList');
+        // Fetch initial data for tables and menu items when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/order', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Populate table numbers dropdown
+                const tablesDropdown = document.getElementById('tables');
+                data.table_numbers.forEach(table_number => {
+                    const option = document.createElement('option');
+                    option.value = table_number;
+                    option.textContent = table_number;
+                    tablesDropdown.appendChild(option);
+                });
 
-                    data.menus.forEach(menu => {
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `
-                            <h3>ID Menu: ${menu.id_menu}</h3>
-                            <p>Nama Menu: ${menu.nama_menu}</p>
-                            <p>Harga: ${menu.harga}</p>
-                            <p>Tipe: ${menu.tipe}</p>
-                            ${menu.image_base64 ? `<img src="${menu.image_base64}" alt="Gambar Menu">` : ''}
-                            <!-- Tombol Edit -->
-                            <button onclick="editMenu('${menu.id_menu}')">Edit</button>
-                            <!-- Tombol Delete -->
-                            <button onclick="deleteMenu('${menu.id_menu}')">Delete</button>
-                        `;
-                        menuList.appendChild(listItem);
-                    });
+                // Populate menu items as checkboxes
+                const menuList = document.getElementById('menuList');
+                data.menu_names.forEach(menu_name => {
+                    const listItem = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'selected_menu[]';
+                    checkbox.value = menu_name;
+                    listItem.appendChild(checkbox);
+                    
+                    const label = document.createElement('label');
+                    label.textContent = menu_name;
+                    listItem.appendChild(label);
+                    
+                    menuList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            // Fetch order details and populate the form with existing order data
+            fetchOrderDetails();
+            });
+
+            // Form submission handling
+            document.getElementById('orderForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Get form data
+                const formData = new FormData(this);
+                const data = {};
+
+                // Convert FormData to JSON
+                formData.forEach(function(value, key){
+                    if (data[key]) {
+                        if (!Array.isArray(data[key])) {
+                            data[key] = [data[key]];
+                        }
+                        data[key].push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                });
+
+                // Send data as JSON using fetch
+                fetch('/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => {
+                    // Handle response
+                    console.log('Response:', response);
+                    // Redirect to /order if the submission was successful (status code 200-299)
+                    if (response.ok) {
+                        // Refresh the order details after submission
+                        fetchOrderDetails();
+                    }
                 })
                 .catch(error => {
+                    // Handle error
                     console.error('Error:', error);
                 });
+            });
         });
 
-        function editMenu(id_menu) {
-            // Redirect ke halaman edit dengan ID menu yang dipilih
-            window.location.href = '/menu/' + id_menu;
+        // Function to update order using PUT request
+        function updateOrder() {
+            const orderId = document.getElementById('order_id').value;
+            const selectedNoMeja = document.getElementById('tables').value;
+
+            // Data to be sent in the PUT request
+            const data = {
+                kode_order: orderId,
+                no_meja: selectedNoMeja
+                // Add other fields to be updated as needed
+            };
+
+            fetch(`/order/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result); // Log the response from the server
+                // Refresh order details after the update
+                fetchOrderDetails();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
 
-        function deleteMenu(id_menu) {
-            if (confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
-                fetch('/menu/' + id_menu, {
-                    method: 'DELETE'
-                })
+        // Function to fetch order details and populate the form
+        function fetchOrderDetails() {
+            fetch('/order/<YOUR_ORDER_ID>') // Replace with your endpoint to fetch order details
                 .then(response => response.json())
                 .then(data => {
-                    alert(data.message);
-                    // Refresh halaman setelah penghapusan berhasil
-                    window.location.reload();
+                    // Populate form fields with existing order data
+                    document.getElementById('reservasi').value = data.nama_reservasi;
+                    document.getElementById('tables').value = data.no_meja;
+                    document.getElementById('status_order').value = data.status_order;
+                    document.getElementById('order_id').value = data.order_id; // Set order_id for PUT request
+                    // Populate menuList with existing menu items
+                    // ...
+
+                    // Display order details in orderList (if needed)
+                    // ...
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Error fetching order details:', error);
                 });
-            }
         }
     </script>
 </body>
