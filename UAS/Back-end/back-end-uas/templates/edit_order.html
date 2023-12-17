@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List Orders</title>
+</head>
+<body>
+    <h1>List Orders</h1>
+    <ul id="orderList">
+        <!-- Orders will be displayed here -->
+    </ul>
+
+    <script>
+        // Function to fetch and display orders
+        function fetchOrders() {
+            fetch('/order/all', { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    const orderList = document.getElementById('orderList');
+                    orderList.innerHTML = ''; // Clear previous list
+
+                    data.orders.forEach(order => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            Order ID: ${order.order_id}<br>
+                            Status: ${order.status_order}<br>
+                            <button onclick="updateOrderStatus('${order.order_id}')">Update Status</button>
+                            <hr>
+                        `;
+                        orderList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to update order status
+        function updateOrderStatus(orderId) {
+            const data = { order_id: orderId };
+            fetch(`/order/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchOrders(); // Refresh order list after update
+                    console.log(`Order ${orderId} status updated successfully.`);
+                } else {
+                    console.error(`Failed to update order ${orderId} status.`);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Fetch orders when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchOrders();
+        });
+    </script>
+</body>
+</html>

@@ -1,71 +1,174 @@
-<!-- insert_menu.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Insert Menu</title>
+    <title>Order Input Form</title>
 </head>
 <body>
-    <h1>Insert Menu</h1>
-    <form id="menuForm">
-        <label for="namaMenu">Nama Menu:</label><br>
-        <input type="text" id="namaMenu" name="namaMenu"><br><br>
-        
-        <label for="hargaMenu">Harga:</label><br>
-        <input type="number" id="hargaMenu" name="hargaMenu"><br><br>
-        
-        <label for="tipeMenu">Tipe:</label><br>
-        <select id="tipeMenu" name="tipeMenu">
-            <option value="Makanan">Makanan</option>
-            <option value="Minuman">Minuman</option>
-        </select><br><br>
+    <h1>Order Form</h1>
 
-        <label for="gambarMenu">Gambar:</label><br>
-        <input type="file" id="gambarMenu" name="gambarMenu"><br><br>
-        
-        <button type="button" onclick="insertMenu()">Insert Menu</button>
+    <form id="orderForm" method="POST" action="/order">
+        <label for="reservasi">Nama Reservasi:</label>
+        <input type="text" id="reservasi" name="reservasi"><br><br>
+    
+        <label for="tables">Pilih Nomor Meja:</label>
+        <select id="tables" name="tables">
+            <!-- Table numbers will be populated dynamically -->
+        </select><br><br>
+    
+        <label>Daftar Menu:</label>
+        <ul id="menuList">
+            <!-- Menu items will be populated dynamically -->
+        </ul><br>
+    
+        <label for="status_order">Status Order:</label>
+        <select id="status_order" name="status_order">
+            <option value="Terbuka">Terbuka</option>
+            <option value="Tertutup">Tertutup</option>
+        </select><br><br>
+    
+        <input type="submit" value="Submit">
     </form>
+    
+
+    <div id="orderList">
+        <!-- Daftar pesanan akan ditambahkan di sini -->
+    </div>
 
     <script>
-        function insertMenu() {
-            var namaMenu = document.getElementById('namaMenu').value;
-            var hargaMenu = document.getElementById('hargaMenu').value;
-            var tipeMenu = document.getElementById('tipeMenu').value;
-            var gambarMenuInput = document.getElementById('gambarMenu').files[0];
-    
-            var reader = new FileReader();
-            reader.readAsDataURL(gambarMenuInput);
-            reader.onload = function () {
-                var base64Image = reader.result.split(',')[1];
-    
-                var data = {
-                    namaMenu: namaMenu,
-                    hargaMenu: hargaMenu,
-                    tipeMenu: tipeMenu,
-                    gambarMenu: base64Image
-                };
-    
-                fetch('/menu', {
+        // Fetch initial data for tables and menu items when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/order', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Populate table numbers dropdown
+                const tablesDropdown = document.getElementById('tables');
+                data.table_numbers.forEach(table_number => {
+                    const option = document.createElement('option');
+                    option.value = table_number;
+                    option.textContent = table_number;
+                    tablesDropdown.appendChild(option);
+                });
+
+                // Populate menu items as checkboxes
+                const menuList = document.getElementById('menuList');
+                data.menu_names.forEach(menu_name => {
+                    const listItem = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'selected_menu[]';
+                    checkbox.value = menu_name;
+                    listItem.appendChild(checkbox);
+                    
+                    const label = document.createElement('label');
+                    label.textContent = menu_name;
+                    listItem.appendChild(label);
+                    
+                    menuList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            // Fetch order details and populate the form with existing order data
+            fetchOrderDetails();
+            });
+
+            // Form submission handling
+            document.getElementById('orderForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Get form data
+                const formData = new FormData(this);
+                const data = {};
+
+                // Convert FormData to JSON
+                formData.forEach(function(value, key){
+                    if (data[key]) {
+                        if (!Array.isArray(data[key])) {
+                            data[key] = [data[key]];
+                        }
+                        data[key].push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                });
+
+                // Send data as JSON using fetch
+                fetch('/order', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    alert(data.message);
-                    
-                    // Redirect ke tampilan menu setelah berhasil menyimpan
-                    window.location.href = '/menu';
+                .then(response => {
+                    // Handle response
+                    console.log('Response:', response);
+                    // Redirect to /order if the submission was successful (status code 200-299)
+                    if (response.ok) {
+                        // Refresh the order details after submission
+                        fetchOrderDetails();
+                    }
                 })
                 .catch(error => {
+                    // Handle error
                     console.error('Error:', error);
                 });
+            });
+        });
+
+        // Function to update order using PUT request
+        function updateOrder() {
+            const orderId = document.getElementById('order_id').value;
+            const selectedNoMeja = document.getElementById('tables').value;
+
+            // Data to be sent in the PUT request
+            const data = {
+                kode_order: orderId,
+                no_meja: selectedNoMeja
+                // Add other fields to be updated as needed
             };
+
+            fetch(`/order/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result); // Log the response from the server
+                // Refresh order details after the update
+                fetchOrderDetails();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Function to fetch order details and populate the form
+        function fetchOrderDetails() {
+            fetch('/order/<YOUR_ORDER_ID>') // Replace with your endpoint to fetch order details
+                .then(response => response.json())
+                .then(data => {
+                    // Populate form fields with existing order data
+                    document.getElementById('reservasi').value = data.nama_reservasi;
+                    document.getElementById('tables').value = data.no_meja;
+                    document.getElementById('status_order').value = data.status_order;
+                    document.getElementById('order_id').value = data.order_id; // Set order_id for PUT request
+                    // Populate menuList with existing menu items
+                    // ...
+
+                    // Display order details in orderList (if needed)
+                    // ...
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
         }
     </script>
-    
 </body>
 </html>
