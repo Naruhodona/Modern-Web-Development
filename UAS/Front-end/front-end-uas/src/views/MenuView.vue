@@ -165,11 +165,14 @@ export default {
             
         }
     },
-    computed:{
-        
-    },
     mounted(){
         this.menus = this.$route.params.menus;
     }
 }
 </script>
+
+<style scoped>
+    table td {
+        vertical-align: middle;
+    }
+</style>

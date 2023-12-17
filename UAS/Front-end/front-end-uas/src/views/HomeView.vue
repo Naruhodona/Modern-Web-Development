@@ -86,7 +86,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 
 .table-number {
   border: 1px solid #ccc;
@@ -98,6 +98,5 @@ export default {
 
 body {
   margin: 0;
-  border: 1px solid black;
 }
 </style>
