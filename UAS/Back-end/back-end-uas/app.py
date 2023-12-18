@@ -183,68 +183,68 @@ def login():
 #     except Exception as e:
 #         return jsonify({'message': str(e)}), 500
 
-@app.route('/menu/<id_menu>', methods=['GET', 'PUT', 'DELETE'])
-def selected_menu(id_menu):
-    if request.method == 'GET':
-        try:
-            menu = Menu.query.filter_by(id_menu=id_menu).first()
+# @app.route('/menu/<id_menu>', methods=['GET', 'PUT', 'DELETE'])
+# def selected_menu(id_menu):
+#     if request.method == 'GET':
+#         try:
+#             menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-            if menu:
-                # Mengubah data gambar BLOB ke format base64
-                if menu.gambar:
-                    image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
-                    menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
+#             if menu:
+#                 # Mengubah data gambar BLOB ke format base64
+#                 if menu.gambar:
+#                     image_base64 = base64.b64encode(menu.gambar).decode('utf-8')
+#                     menu.image_base64 = f"data:image/jpeg;base64,{image_base64}"
 
-                return jsonify({
-                    'id_menu': menu.id_menu,
-                    'nama_menu': menu.nama_menu,
-                    'harga': menu.harga,
-                    'tipe': menu.tipe,
-                    'gambar': menu.image_base64 if menu.gambar else None
-                }), 200
-            else:
-                return jsonify({'message': 'Menu not found'}), 404
-        except Exception as e:
-            return jsonify({'message': str(e)}), 500
-    elif request.method == 'PUT':
-        try:
-            data = request.json 
+#                 return jsonify({
+#                     'id_menu': menu.id_menu,
+#                     'nama_menu': menu.nama_menu,
+#                     'harga': menu.harga,
+#                     'tipe': menu.tipe,
+#                     'gambar': menu.image_base64 if menu.gambar else None
+#                 }), 200
+#             else:
+#                 return jsonify({'message': 'Menu not found'}), 404
+#         except Exception as e:
+#             return jsonify({'message': str(e)}), 500
+#     elif request.method == 'PUT':
+#         try:
+#             data = request.json 
 
-            menu = Menu.query.filter_by(id_menu=id_menu).first()
+#             menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-            if menu:
-                menu.nama_menu = data.get('nama_menu', menu.nama_menu)  # Perbaikan nama field
-                menu.harga = int(data.get('harga', menu.harga))  # Perbaikan nama field
-                menu.tipe = data.get('tipe', menu.tipe)  # Perbaikan nama field
+#             if menu:
+#                 menu.nama_menu = data.get('nama_menu', menu.nama_menu)  # Perbaikan nama field
+#                 menu.harga = int(data.get('harga', menu.harga))  # Perbaikan nama field
+#                 menu.tipe = data.get('tipe', menu.tipe)  # Perbaikan nama field
 
-                # Update gambar jika ada perubahan
-                if data['gambar']:  # Perbaikan nama field
-                    gambarMenu_base64 = data['gambar']
-                    gambarMenu = base64.b64decode(gambarMenu_base64)
-                    menu.gambar = gambarMenu
+#                 # Update gambar jika ada perubahan
+#                 if data['gambar']:  # Perbaikan nama field
+#                     gambarMenu_base64 = data['gambar']
+#                     gambarMenu = base64.b64decode(gambarMenu_base64)
+#                     menu.gambar = gambarMenu
 
-                db.session.commit()
+#                 db.session.commit()
 
-                return jsonify({'message': 'Menu updated successfully'}), 200
-            else:
-                return jsonify({'message': 'Menu not found'}), 404
+#                 return jsonify({'message': 'Menu updated successfully'}), 200
+#             else:
+#                 return jsonify({'message': 'Menu not found'}), 404
 
-        except Exception as e:
-            return jsonify({'message': str(e)}), 500
-    elif request.method == 'DELETE':
-        try:
-            menu = Menu.query.filter_by(id_menu=id_menu).first()
+#         except Exception as e:
+#             return jsonify({'message': str(e)}), 500
+#     elif request.method == 'DELETE':
+#         try:
+#             menu = Menu.query.filter_by(id_menu=id_menu).first()
 
-            if menu:
-                db.session.delete(menu)
-                db.session.commit()
-                return jsonify({'message': 'Menu deleted successfully'}), 200
-            else:
-                return jsonify({'message': 'Menu not found'}), 404
-        except Exception as e:
-            return jsonify({'message': str(e)}), 500
-    else:
-        return jsonify({'message': 'Method not allowed'}), 405
+#             if menu:
+#                 db.session.delete(menu)
+#                 db.session.commit()
+#                 return jsonify({'message': 'Menu deleted successfully'}), 200
+#             else:
+#                 return jsonify({'message': 'Menu not found'}), 404
+#         except Exception as e:
+#             return jsonify({'message': str(e)}), 500
+#     else:
+#         return jsonify({'message': 'Method not allowed'}), 405
 
 @app.route('/menu', methods=['POST', 'GET'])
 def menu():
@@ -333,7 +333,7 @@ def selected_menu(id_menu):
         
     elif request.method == 'PUT':
         try:
-            data = request.json 
+            data = request.json
 
             menu = Menu.query.filter_by(id_menu=id_menu).first()
 
@@ -432,12 +432,13 @@ def order():
     
     elif request.method == 'POST':
         data = request.get_json()
+        order_id = data.get('order_id')
         nama_reservasi = data.get('reservasi')
         nomor_meja = data.get('tables')
         status_order = data.get('status_order')
-        menu_selected = data.get('selected_menu[]')
+        menu_selected = data.get('selected_menu')
         meja = Meja.query.filter_by(no_meja=nomor_meja).first()
-
+        
         if not isinstance(menu_selected, list):
             menu_selected = [menu_selected]
         if meja:
@@ -445,37 +446,61 @@ def order():
 
         count_orders = Order.query.count()
         kode_order = Order.query.count()
-        menus = Menu.query.filter(Menu.nama_menu.in_(menu_selected)).all()
+        menus = Menu.query.filter(Menu.id_menu.in_(menu_selected)).all()
 
         if not menus:
             return jsonify({'error': 'Menus not found'}), 404
 
         id_menus = [menu.id_menu for menu in menus]
+        if order_id:
+            for id_menu in id_menus:
+                new_order = Order(
+                    kode_order = kode_order,
+                    order_id=order_id,
+                    status_order=status_order,
+                    id_menu=id_menu,
+                    no_meja=nomor_meja,
+                    nama_reservasi=nama_reservasi
+                )
+                db.session.add(new_order)
+                kode_order += 1
 
-        for id_menu in id_menus:
-            new_id_order = f"ORD-{count_orders + 1}"
-            new_order = Order(
-                kode_order = kode_order,
-                order_id=new_id_order,
-                status_order=status_order,
-                id_menu=id_menu,
-                no_meja=nomor_meja,
-                nama_reservasi=nama_reservasi
-            )
-            db.session.add(new_order)
-            kode_order += 1
+            db.session.commit()
+            response_data = {
+                'message': 'Order submitted successfully',
+                'nama_reservasi': nama_reservasi,
+                'nomor_meja': nomor_meja,
+                'status_order': status_order,
+                'selected_menu': menu_selected,
+                'order_id': order_id
+            }
+            return jsonify(response_data)
+        else:
+            new_id_order = ''
+            for id_menu in id_menus:
+                new_id_order = f"ORD-{count_orders + 1}"
+                new_order = Order(
+                    kode_order = kode_order,
+                    order_id=new_id_order,
+                    status_order=status_order,
+                    id_menu=id_menu,
+                    no_meja=nomor_meja,
+                    nama_reservasi=nama_reservasi
+                )
+                db.session.add(new_order)
+                kode_order += 1
 
-        db.session.commit()
+            db.session.commit()
 
-        response_data = {
-            'message': 'Order submitted successfully',
-            'nama_reservasi': nama_reservasi,
-            'nomor_meja': nomor_meja,
-            'status_order': status_order,
-            'selected_menu': menu_selected
-        }
-
-        return jsonify(response_data)
+            response_data = {
+                'message': 'Order submitted successfully',
+                'nama_reservasi': nama_reservasi,
+                'nomor_meja': nomor_meja,
+                'status_order': status_order,
+                'selected_menu': menu_selected,
+                'order_id': new_id_order
+            }
+            return jsonify(response_data)
 
 @app.route('/order/<string:order_id>', methods=['GET', 'PUT'])
 def selected_order(order_id):
@@ -499,24 +524,24 @@ def selected_order(order_id):
 
     elif request.method == 'PUT':
         data = request.get_json()
-        kode_order = data.get('kode_order')
+        # kode_order = data.get('kode_order')
         no_meja = data.get('no_meja')
 
-        if kode_order:
-            updated_orders = Order.query.filter_by(order_id=order_id).all()
-            for order in updated_orders:
-                order.status_order = "Tertutup"
+        # if kode_order:
+        updated_orders = Order.query.filter_by(order_id=order_id).all()
+        for order in updated_orders:
+            order.status_order = "Tertutup"
 
-            if no_meja:
-                meja = Meja.query.filter_by(no_meja=no_meja).first()
-                if meja:
-                    meja.status = "AVAILABLE"
+        if no_meja:
+            meja = Meja.query.filter_by(no_meja=no_meja).first()
+            if meja:
+                meja.status = "AVAILABLE"
 
-            db.session.commit()
-            return jsonify({'message': 'Order status and Meja status updated successfully',
-                            'Meja status': meja.status if meja else None})
-        else:
-            return jsonify({'error': 'Missing kode_order in the request'}), 400
+        db.session.commit()
+        return jsonify({'message': 'Order status and Meja status updated successfully',
+                        'Meja status': meja.status if meja else None})
+        # else:
+        #     return jsonify({'error': 'Missing kode_order in the request'}), 400
 
 # @app.route('/list_order', methods=['GET'])
 # def list_orders():

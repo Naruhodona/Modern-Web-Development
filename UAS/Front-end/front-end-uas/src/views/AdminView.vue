@@ -48,7 +48,6 @@ export default {
             .then(response => {
                 this.menus = response.data.menus;
             });
-        // console.log(this.menus);
     }
 }
 </script>
@@ -76,6 +75,7 @@ nav div {
     font: inherit;
     opacity: 1;
     font-size: 24px;
+    font-weight: bold;
     padding: 0;
     margin: 0;
 }

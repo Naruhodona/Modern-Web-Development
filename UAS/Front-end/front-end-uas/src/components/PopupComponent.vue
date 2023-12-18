@@ -1,7 +1,7 @@
 <template>
     <div class="popup">
         <input type="text" v-model="number">
-        <button @click="closePopup">X</button>
+        <button @click="closePopup">Book</button>
     </div>
 </template>
 
