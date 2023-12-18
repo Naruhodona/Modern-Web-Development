@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create New Order</title>
+</head>
+<body>
+  <h1>Create New Order</h1>
+  <form id="newOrderForm" method="POST" action="/order/your_order_id_here">
+    <label for="kode_order">Kode Order:</label><br>
+    <input type="text" id="kode_order" name="kode_order"><br><br>
+    
+    <label for="reservasi">Nama Reservasi:</label><br>
+    <input type="text" id="reservasi" name="reservasi"><br><br>
+    
+    <label for="tables">Nomor Meja:</label><br>
+    <input type="text" id="tables" name="tables"><br><br>
+    
+    <label for="status_order">Status Order:</label><br>
+    <select id="status_order" name="status_order">
+      <option value="TERBUKA">Terbuka</option>
+      <option value="LAINNYA">Other Status</option>
+      <!-- Add more options if needed -->
+    </select><br><br>
+    
+    <label for="selected_menu">Selected Menu:</label><br>
+    <input type="checkbox" id="menu1" name="selected_menu[]" value="Menu1">
+    <label for="menu1">Menu 1</label><br>
+    <input type="checkbox" id="menu2" name="selected_menu[]" value="Menu2">
+    <label for="menu2">Menu 2</label><br>
+    <!-- Add more menu options if needed -->
+    
+    <br><br>
+    <input type="submit" value="Submit Order">
+  </form>
+</body>
+</html>
