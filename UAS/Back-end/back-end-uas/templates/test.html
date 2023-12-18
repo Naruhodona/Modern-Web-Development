@@ -106,6 +106,7 @@
                 .then(response => {
                     // Handle response
                     console.log('Response:', response);
+                    
                     // Redirect to /order if the submission was successful (status code 200-299)
                     if (response.ok) {
                         // Refresh the order details after submission
@@ -159,11 +160,6 @@
                     document.getElementById('tables').value = data.no_meja;
                     document.getElementById('status_order').value = data.status_order;
                     document.getElementById('order_id').value = data.order_id; // Set order_id for PUT request
-                    // Populate menuList with existing menu items
-                    // ...
-
-                    // Display order details in orderList (if needed)
-                    // ...
                 })
                 .catch(error => {
                     console.error('Error fetching order details:', error);
