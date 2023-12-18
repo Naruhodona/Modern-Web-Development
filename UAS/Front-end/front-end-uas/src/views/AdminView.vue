@@ -13,6 +13,7 @@
 
 <script>
 import { menuService } from '@/_services/menu-service';
+import { orderService } from '@/_services/order-service';
 
 export default {
     data(){
@@ -50,9 +51,13 @@ export default {
         if (storedUser) {
             this.isLoggedIn = true;
             menuService.fetchAllMenus()
-            .then(response => {
-                this.menus = response.data.menus;
-            });
+                .then(response => {
+                    this.menus = response.data.menus;
+                });
+            orderService.fetchAllOrders()
+                .then(response => {
+                    this.orders = response.data.orders_with_details
+                });
         } else {
             this.$router.push({
                 name: 'admin-login',

@@ -15,5 +15,9 @@ export const orderService = {
     createOrder(data){
         const url = API_Order;
         return axios.post(url, data);
+    },
+    addOrder(data, order_id){
+        const url = API_Order + '/' + order_id;
+        return axios.post(url, data);
     }
 }

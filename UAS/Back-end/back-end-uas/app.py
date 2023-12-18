@@ -203,7 +203,7 @@ def test():
 @app.route('/order', methods=['GET', 'POST'])
 def order():
     if request.method == 'GET':
-        all_orders = db.session.query(Order).all()
+        all_orders = Order.query.filter_by(status_order='Terbuka').all()
 
         orders_with_details = []
 
@@ -240,11 +240,11 @@ def order():
     
     elif request.method == 'POST':
         data = request.get_json()
-        order_id = data.get('order_id')
+        # order_id = data.get('order_id')
         nama_reservasi = data.get('reservasi')
         nomor_meja = data.get('tables')
         status_order = data.get('status_order')
-        menu_selected = data.get('selected_menu[]')
+        menu_selected = data.get('selected_menu')
    
         meja = Meja.query.filter_by(no_meja=nomor_meja).first()
        
@@ -255,66 +255,66 @@ def order():
 
         count_orders = Order.query.count()
         kode_order = Order.query.count()
-        menus = Menu.query.filter(Menu.nama_menu.in_(menu_selected)).all()
+        menus = Menu.query.filter(Menu.id_menu.in_(menu_selected)).all()
     
         # if not menus:
         #     return jsonify({'error': 'Menus not found'}), 404
    
         id_menus = [menu.id_menu for menu in menus]
 
-        if order_id:
-            for id_menu in id_menus:
-                new_order = Order(
-                    kode_order = kode_order,
-                    order_id=order_id,
-                    status_order=status_order,
-                    id_menu=id_menu,
-                    no_meja=nomor_meja,
-                    nama_reservasi=nama_reservasi
-                )
-                db.session.add(new_order)
-                kode_order += 1
+        # if order_id:
+        #     for id_menu in id_menus:
+        #         new_order = Order(
+        #             kode_order = kode_order,
+        #             order_id=order_id,
+        #             status_order=status_order,
+        #             id_menu=id_menu,
+        #             no_meja=nomor_meja,
+        #             nama_reservasi=nama_reservasi
+        #         )
+        #         db.session.add(new_order)
+        #         kode_order += 1
             
-            db.session.commit()
-            response_data = {
-                'message': 'Order submitted successfully',
-                'nama_reservasi': nama_reservasi,
-                'nomor_meja': nomor_meja,
-                'status_order': status_order,
-                'selected_menu': menu_selected,
-                'order_id': order_id
-            }
-            return jsonify(response_data)
-        else:
+        #     db.session.commit()
+        #     response_data = {
+        #         'message': 'Order submitted successfully',
+        #         'nama_reservasi': nama_reservasi,
+        #         'nomor_meja': nomor_meja,
+        #         'status_order': status_order,
+        #         'selected_menu': menu_selected,
+        #         'order_id': order_id
+        #     }
+        #     return jsonify(response_data)
+        # else:
         
-            new_id_order = ''
-            print(id_menus, "kadawjd")
-            for id_menu in id_menus:
-                
-                new_id_order = f"ORD-{count_orders + 1}"
-                new_order = Order(
-                    kode_order = kode_order,
-                    order_id=new_id_order,
-                    status_order=status_order,
-                    id_menu=id_menu,
-                    no_meja=nomor_meja,
-                    nama_reservasi=nama_reservasi
-                )
-                db.session.add(new_order)
-                kode_order += 1
-            print("commit")
-            db.session.commit() 
-           
-            response_data = {
-                'message': 'Order submitted successfully',
-                'nama_reservasi': nama_reservasi,
-                'nomor_meja': nomor_meja,
-                'status_order': status_order,
-                'selected_menu': menu_selected,
-                'order_id': new_id_order
-            }
-            print(response_data)
-            return jsonify(response_data)
+        new_id_order = ''
+        print(id_menus, "kadawjd")
+        for id_menu in id_menus:
+            
+            new_id_order = f"ORD-{count_orders + 1}"
+            new_order = Order(
+                kode_order = kode_order,
+                order_id=new_id_order,
+                status_order=status_order,
+                id_menu=id_menu,
+                no_meja=nomor_meja,
+                nama_reservasi=nama_reservasi
+            )
+            db.session.add(new_order)
+            kode_order += 1
+        print("commit")
+        db.session.commit() 
+        
+        response_data = {
+            'message': 'Order submitted successfully',
+            'nama_reservasi': nama_reservasi,
+            'nomor_meja': nomor_meja,
+            'status_order': status_order,
+            'selected_menu': menu_selected,
+            'order_id': new_id_order
+        }
+        print(response_data)
+        return jsonify(response_data)
 
 @app.route('/order/<string:order_id>', methods=['GET', 'PUT', 'POST'])
 def selected_order(order_id):
@@ -358,12 +358,13 @@ def selected_order(order_id):
     if request.method == 'POST':
         data = request.get_json()
         order_id = data[0].get('order_id')
-        kode_order = data[0].get('kode_order')
+        # kode_order = data[0].get('kode_order')
+        kode_order = Order.query.count()
         nama_reservasi = data[0].get('nama_reservasi')
         nomor_meja = data[0].get('no_meja')
         status_order = data[0].get('status_order')
         menu_selected = data[0].get('id_menu')
-        menus = Menu.query.filter(Menu.nama_menu.in_(menu_selected)).all()
+        menus = Menu.query.filter(Menu.id_menu.in_(menu_selected)).all()
         id_menus = [menu.id_menu for menu in menus]
 
         if status_order == "Terbuka":
@@ -377,8 +378,10 @@ def selected_order(order_id):
                     nama_reservasi=nama_reservasi
                 )
                 db.session.add(new_order)
-     
-            db.session.commit() 
+                kode_order+=1
+            
+            db.session.commit()
+            
             response_data = {
                 'message': 'Order submitted successfully',
             }

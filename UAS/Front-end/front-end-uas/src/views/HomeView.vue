@@ -132,14 +132,16 @@ export default {
     },
     addOrder(){
       if(this.namaReservasi && (this.pilihanMenu.length > 1)){
-        const data = {
-          reservasi: this.namaReservasi,
-          selected_menu: this.pilihanMenu,
-          tables: this.numberTablePopup,
-          status_order: 'Terbuka',
-          order_id: this.orderId
-        };
-        orderService.createOrder(data).then(() => {
+        const data = [
+            {
+              nama_reservasi: this.namaReservasi,
+              id_menu: this.pilihanMenu,
+              no_meja: this.numberTablePopup,
+              status_order: 'Terbuka',
+              order_id: this.orderId
+            }
+          ];
+        orderService.addOrder(data, this.orderId).then(() => {
           this.pilihanMenu = [];
         });
       }else{

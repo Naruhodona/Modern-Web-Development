@@ -6,6 +6,7 @@
       <b-form-group label="Password">
         <b-form-input type="password" v-model="password" required></b-form-input>
       </b-form-group>
+      <b-button @click="login">Login</b-button>
   </div>
 </template>
 
@@ -38,7 +39,11 @@ export default {
           }
           // Simpan informasi login ke session storage atau local storage
           sessionStorage.setItem('user', JSON.stringify(user));
-          
+          if (this.isLoggedIn) {
+            this.$router.push({
+                name: 'admin',
+            })
+          }
         });
       } catch (error) {
       // Tangani kesalahan jika login gagal
