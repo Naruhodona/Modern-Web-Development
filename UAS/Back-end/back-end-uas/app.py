@@ -53,16 +53,19 @@ class Order(db.Model):
 def login():
     data = request.json 
     username = data.get('username')
-
+    password = data.get('password')
     admin = Admin.query.filter_by(username=username).first()
 
     if admin:
-        admin_data = {
-            'id_admin': admin.id_admin,
-            'username': admin.username,
-            'password': admin.password
-        }
-        return jsonify({'admin': admin_data}), 200
+        if password == admin.password:
+            admin_data = {
+                'id_admin': admin.id_admin,
+                'username': admin.username,
+                'password': admin.password
+            }
+            return jsonify({'admin': admin_data}), 200
+        else:
+            return jsonify({'message': 'Admin not found'}), 404
     else:
         return jsonify({'message': 'Admin not found'}), 404
 

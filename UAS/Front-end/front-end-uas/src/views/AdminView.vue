@@ -4,6 +4,7 @@
             <div>
                 <button class="link-button" id="menu" @click="goToMenu">Menu</button>
                 <button class="link-button" id="order" @click="goToOrder">Order</button>
+
             </div> 
         </nav>
         <router-view />
@@ -17,7 +18,8 @@ export default {
     data(){
         return{
             menus: [],
-            orders: []
+            orders: [],
+            isLoggedIn: false,
         }
     },
     methods: {
@@ -44,10 +46,19 @@ export default {
     },
     
     mounted (){
-        menuService.fetchAllMenus()
+        const storedUser = sessionStorage.getItem('user');
+        if (storedUser) {
+            this.isLoggedIn = true;
+            menuService.fetchAllMenus()
             .then(response => {
                 this.menus = response.data.menus;
             });
+        } else {
+            this.$router.push({
+                name: 'admin-login',
+            })
+        }
+        
     }
 }
 </script>
