@@ -4,7 +4,7 @@
             <div>
                 <button class="link-button" id="menu" @click="goToMenu">Menu</button>
                 <button class="link-button" id="order" @click="goToOrder">Order</button>
-
+                <button class="link-button" id="logout" @click="logOut">Logout</button>
             </div> 
         </nav>
         <router-view />
@@ -43,6 +43,13 @@ export default {
             });
             document.getElementById('menu').disabled = false;
             document.getElementById('order').disabled = true;
+        },
+        logOut(){
+            sessionStorage.removeItem('user');
+            this.isLoggedIn = false;
+            this.$router.push({
+                name: 'admin-login',
+            });
         }
     },
     
