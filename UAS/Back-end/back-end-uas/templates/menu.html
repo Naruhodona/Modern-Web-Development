@@ -1,0 +1,66 @@
+<!-- show_menu.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Show Menu</title>
+</head>
+<body>
+    <h1>Menu</h1>
+    <ul id="menuList">
+        <!-- Daftar menu akan ditampilkan di sini -->
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/menu') // Mengambil data menu dari API Flask
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const menuList = document.getElementById('menuList');
+
+                    data.menus.forEach(menu => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <h3>ID Menu: ${menu.id_menu}</h3>
+                            <p>Nama Menu: ${menu.nama_menu}</p>
+                            <p>Harga: ${menu.harga}</p>
+                            <p>Tipe: ${menu.tipe}</p>
+                            ${menu.gambar ? `<img src="${menu.image_base64}" alt="Gambar Menu">` : ''}
+                            <!-- Tombol Edit -->
+                            <button onclick="editMenu('${menu.id_menu}')">Edit</button>
+                            <!-- Tombol Delete -->
+                            <button onclick="deleteMenu('${menu.id_menu}')">Delete</button>
+                        `;
+                        menuList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        function editMenu(id_menu) {
+            // Redirect ke halaman edit dengan ID menu yang dipilih
+            window.location.href = '/menu-edit/' + id_menu;
+        }
+
+        function deleteMenu(id_menu) {
+            if (confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
+                fetch('/menu/' + id_menu, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // Refresh halaman setelah penghapusan berhasil
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

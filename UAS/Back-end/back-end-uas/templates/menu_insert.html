@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert Menu</title>
+</head>
+<body>
+    <h1>Insert Menu</h1>
+    <form id="menuForm">
+        <label for="namaMenu">Nama Menu:</label><br>
+        <input type="text" id="namaMenu" name="namaMenu"><br><br>
+        
+        <label for="hargaMenu">Harga:</label><br>
+        <input type="number" id="hargaMenu" name="hargaMenu"><br><br>
+        
+        <label for="tipeMenu">Tipe:</label><br>
+        <select id="tipeMenu" name="tipeMenu">
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
+        </select><br><br>
+
+        <label for="gambarMenu">Gambar:</label><br>
+        <input type="file" id="gambarMenu" name="gambarMenu"><br><br>
+        
+        <button type="button" onclick="insertMenu()">Insert Menu</button>
+    </form>
+
+    <script>
+        function insertMenu() {
+            var namaMenu = document.getElementById('namaMenu').value;
+            var hargaMenu = document.getElementById('hargaMenu').value;
+            var tipeMenu = document.getElementById('tipeMenu').value;
+            var gambarMenuInput = document.getElementById('gambarMenu').files[0];
+    
+            var reader = new FileReader();
+            reader.readAsDataURL(gambarMenuInput);
+            reader.onload = function () {
+                var base64Image = reader.result.split(',')[1];
+    
+                var data = {
+                    namaMenu: namaMenu,
+                    hargaMenu: hargaMenu,
+                    tipeMenu: tipeMenu,
+                    gambarMenu: base64Image
+                };
+    
+                fetch('/menu', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Atur Content-Type ke application/json
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert(data.message);
+                    
+                    // Redirect ke tampilan menu setelah berhasil menyimpan
+                    window.location.href = '/menu';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            };
+        }
+    </script>
+    
+</body>
+</html>
