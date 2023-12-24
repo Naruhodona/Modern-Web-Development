@@ -23,12 +23,12 @@
           <!-- Nomor Meja -->
           <div v-for="table in tables" :key="table.no_meja" class="col-md-3">
             <div :class="getTableStatusClass(table.status)" :id="table.no_meja" @click="chooseTable(table.no_meja)">
-              <h3>Table <br> {{ table.no_meja }}</h3>
+              <h3>Meja <br> {{ table.no_meja }}</h3>
             </div> 
           </div>
           <div class="info">
-            <div style="background-color: red; width: 50px; height: 50px; margin: 10px"></div><span style="align-self: center; margin: 10px">OCCUPIED</span>
-            <div style="background-color: lightgrey; width: 50px; height: 50px; margin: 10px"></div><span style="align-self: center; margin: 10px">AVAILABLE</span>
+            <div style="background-color: red; width: 50px; height: 50px; margin: 10px"></div><span style="align-self: center; margin: 10px">DIPAKAI</span>
+            <div style="background-color: lightgrey; width: 50px; height: 50px; margin: 10px"></div><span style="align-self: center; margin: 10px">TERSEDIA</span>
           </div>
           
         </div>
